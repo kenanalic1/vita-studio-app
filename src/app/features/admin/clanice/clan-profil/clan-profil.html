@@ -1,0 +1,183 @@
+<div class="page-header">
+  <div class="page-title-group">
+    <div class="page-date">
+      <button class="back-btn" (click)="nazad()">← Članice</button>
+      / Profil
+    </div>
+    <div class="page-title">{{ profil?.ime }} {{ profil?.prezime }}</div>
+  </div>
+  <div class="header-actions">
+    <a class="btn-outline" [href]="mailtoLink"><lucide-icon name="mail" [size]="14" [strokeWidth]="2"></lucide-icon> Pošalji poruku</a>
+    <button class="btn-primary" (click)="editMode = !editMode">
+      <lucide-icon [name]="editMode ? 'x' : 'pencil'" [size]="14" [strokeWidth]="2"></lucide-icon>
+      {{ editMode ? 'Otkaži' : 'Uredi profil' }}
+    </button>
+  </div>
+</div>
+
+<div class="page-body" *ngIf="!loading && profil">
+  <div class="profil-grid">
+
+    <!-- Lijeva kolona -->
+    <div class="left-col">
+      <div class="card profil-card">
+        <div class="profil-header">
+          <div class="avatar-lg">{{ profil!.ime[0] }}{{ profil!.prezime[0] }}</div>
+          <div>
+            <div class="profil-ime">{{ profil!.ime }} {{ profil!.prezime }}</div>
+            <span class="tag" [ngClass]="clanarinaStatusClass">{{ clanarinaStatusLabel }}</span>
+            <div class="profil-meta">Članica od {{ profil!.datumKreiranja | date:'dd.MM.yyyy' }}</div>
+          </div>
+        </div>
+
+        <div class="profil-info" *ngIf="!editMode">
+          <div class="info-row">
+            <span class="info-label"><lucide-icon name="mail" [size]="14" [strokeWidth]="2"></lucide-icon></span>
+            <span>{{ profil!.email }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label"><lucide-icon name="phone" [size]="14" [strokeWidth]="2"></lucide-icon></span>
+            <span>{{ profil!.telefon }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label"><lucide-icon name="cake" [size]="14" [strokeWidth]="2"></lucide-icon></span>
+            <span>{{ profil!.datumRodjenja | date:'dd.MM.yyyy' }}</span>
+          </div>
+        </div>
+
+        <form *ngIf="editMode && form" [formGroup]="form" (ngSubmit)="saveEdit()" class="edit-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Ime</label>
+              <input formControlName="ime" class="form-input" />
+            </div>
+            <div class="form-group">
+              <label>Prezime</label>
+              <input formControlName="prezime" class="form-input" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input formControlName="email" type="email" class="form-input" />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Telefon</label>
+              <input formControlName="telefon" class="form-input" />
+            </div>
+            <div class="form-group">
+              <label>Datum rođenja</label>
+              <input formControlName="datumRodjenja" type="date" class="form-input" />
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn-primary" [disabled]="saving || form.invalid">
+              {{ saving ? 'Čuva se...' : 'Sačuvaj' }}
+            </button>
+          </div>
+        </form>
+
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-num">{{ profil!.dolasci30d }}</div>
+            <div class="stat-lbl">Dolasci 30d</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num">{{ profil!.ukupnoTermina }}</div>
+            <div class="stat-lbl">Ukupno termina</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num">{{ profil!.otkazivanja }}</div>
+            <div class="stat-lbl">Otkazivanja</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num">{{ profil!.naListiCekanja }}</div>
+            <div class="stat-lbl">Lista čekanja</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Predstojeći termini -->
+      <div class="card">
+        <div class="card-title">Predstojeći termini</div>
+        <div *ngFor="let r of profil!.predstojeciTermini" class="termin-mini">
+          <div class="termin-mini-left">
+            <span class="tag tag-purple">{{ r.terminDatumVreme | date:'HH:mm' }}</span>
+            <div>
+              <div class="termin-mini-naziv">{{ r.aktivnostNaziv }}</div>
+              <div class="text-muted">{{ r.terminDatumVreme | date:'EEE dd.MM' }} · {{ r.salaNaziv }}</div>
+            </div>
+          </div>
+          <span class="tag" [class]="r.status === 'aktivna' ? 'tag-green' : 'tag-yellow'">
+            {{ r.status }}
+          </span>
+        </div>
+        <div *ngIf="!profil!.predstojeciTermini.length" class="empty">Nema predstoječih termina.</div>
+      </div>
+    </div>
+
+    <!-- Desna kolona -->
+    <div class="right-col">
+      <!-- Aktivna članarina -->
+      <div class="card clanarina-card" *ngIf="profil!.aktivnaClanarina">
+        <div class="clanarina-header">
+          <span class="tag tag-purple">Godišnja</span>
+          <span class="clanarina-cena">{{ profil!.aktivnaClanarina.cena | number:'1.0-0' }} RSD</span>
+        </div>
+        <div class="clanarina-naziv">{{ profil!.aktivnaClanarina.nazivPaketa }}</div>
+        <div class="clanarina-datumi">
+          <div>
+            <div class="text-muted">Početak</div>
+            <strong>{{ profil!.aktivnaClanarina.datumPocetka | date:'dd.MM.yyyy' }}</strong>
+          </div>
+          <div>
+            <div class="text-muted">Ističe</div>
+            <strong>{{ profil!.aktivnaClanarina.datumIsteka | date:'dd.MM.yyyy' }}</strong>
+          </div>
+          <div>
+            <div class="text-muted">Preostalo</div>
+            <strong [style.color]="daysLeft < 0 ? '#ef4444' : daysLeft <= 7 ? '#d97706' : 'inherit'">
+              {{ daysLeft < 0 ? 'Istekla' : daysLeft === 0 ? 'Danas ističe' : daysLeft + ' dana' }}
+            </strong>
+          </div>
+        </div>
+        <div class="clanarina-actions">
+<button class="btn-primary" (click)="showProduzi = true">Produži</button>          <button class="btn-outline" (click)="showProduzi = true">Promeni paket</button>
+        </div>
+      </div>
+
+      <!-- Istorija dolazaka -->
+      <div class="card">
+        <div class="card-title">Istorija dolazaka</div>
+        <table class="vs-table">
+          <thead>
+            <tr>
+              <th>Datum</th>
+              <th>Aktivnost</th>
+              <th>Trener</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let e of profil!.istorijaDolazaka">
+              <td>{{ e.datumDolaska | date:'dd.MM.yyyy' }}</td>
+              <td>{{ e.aktivnostNaziv }}</td>
+              <td>{{ e.trenerImePrezime }}</td>
+              <td><span class="tag tag-green">● stigla</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div *ngIf="!profil!.istorijaDolazaka.length" class="empty">Nema istorije dolazaka.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="loading" class="loading">Učitava se...</div>
+<app-produzi-clanarina-modal
+  *ngIf="showProduzi"
+  [clanId]="profil!.id"
+  [aktivnaClanarina]="profil!.aktivnaClanarina"
+  (zatvori)="showProduzi = false"
+  (sacuvano)="onClanarinarSacuvana()">
+</app-produzi-clanarina-modal>

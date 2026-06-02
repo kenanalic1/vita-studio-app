@@ -1,0 +1,119 @@
+<div class="page-header">
+  <div class="page-title-group">
+    <div class="page-date">Operativa</div>
+    <div class="page-title">Check-in</div>
+  </div>
+  <input class="search-input" placeholder="Pretraga članice ili ID..."
+         [(ngModel)]="searchTerm">
+</div>
+
+<div class="page-body">
+  <div class="checkin-layout">
+
+    <!-- Lijeva kolona - termini -->
+    <div class="termini-col">
+      <div class="col-title">Termini danas</div>
+      <div *ngIf="loading" class="loading">Učitava se...</div>
+      <div *ngFor="let t of terminiDanas"
+           class="termin-item"
+           [class.active]="selectedTermin?.id === t.id"
+           (click)="selectTermin(t)">
+        <div class="termin-vreme">{{ t.datumVreme | date:'HH:mm' }}</div>
+        <div class="termin-info">
+          <div class="termin-naziv">{{ t.aktivnostNaziv }}</div>
+          <div class="text-muted">{{ t.salaNaziv }}</div>
+        </div>
+        <span class="termin-fill">{{ t.brojRezervacija }}/{{ t.maxKapacitet }}</span>
+      </div>
+      <div *ngIf="!loading && terminiDanas.length === 0" class="empty">
+        Nema termina danas.
+      </div>
+    </div>
+
+    <!-- Srednja kolona - lista -->
+    <div class="lista-col">
+      <div class="lista-header" *ngIf="selectedTermin">
+        <div>
+          <div class="lista-naziv">{{ selectedTermin.aktivnostNaziv }}</div>
+          <div class="text-muted">
+            {{ selectedTermin.datumVreme | date:'HH:mm' }} ·
+            {{ selectedTermin.salaNaziv }} ·
+            {{ selectedTermin.trenerImePrezime }}
+          </div>
+        </div>
+        <span class="prijavljeno-badge">
+          Prijavljeno {{ stigliCount }}/{{ lista.length }}
+        </span>
+      </div>
+
+      <div *ngIf="loadingLista" class="loading">Učitava se lista...</div>
+
+      <div *ngFor="let item of filteredLista"
+           class="checkin-item"
+           [class.stigao]="item.stigao">
+        <div class="ci-avatar" [class.stigao]="item.stigao">
+          {{ getInitials(item.imePrezime) }}
+        </div>
+        <div class="ci-info">
+          <div class="ci-ime">{{ item.imePrezime }}</div>
+          <div class="text-muted">{{ item.brojClanske }} · {{ item.statusClanarine }}</div>
+        </div>
+        <span class="tag tag-green" *ngIf="item.stigao"><lucide-icon name="check" [size]="12" [strokeWidth]="2.5"></lucide-icon> stigla</span>
+        <button class="check-btn"
+                [class.checked]="item.stigao"
+                (click)="!item.stigao && checkIn(item.clanId)"
+                [disabled]="item.stigao">
+          <lucide-icon *ngIf="item.stigao" name="check" [size]="14" [strokeWidth]="2.5"></lucide-icon>
+        </button>
+      </div>
+
+      <div *ngIf="!loadingLista && filteredLista.length === 0 && selectedTermin" class="empty">
+        Nema prijavljenih na ovaj termin.
+      </div>
+    </div>
+
+    <!-- Desna kolona - statistika -->
+    <div class="stats-col">
+      <div class="col-title">Statistika danas</div>
+      <div class="stat-card">
+        <div class="stat-num">{{ statistika?.prijavljeno ?? 0 }}</div>
+        <div class="stat-lbl">Prijavljeno</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-num">{{ statistika?.stiglo ?? 0 }}</div>
+        <div class="stat-lbl">Stiglo</div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-num">{{ statistika?.otkazano ?? 0 }}</div>
+        <div class="stat-lbl">Otkazano</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-num">{{ statistika?.listaCekanjaPromovisan ?? 0 }}</div>
+        <div class="stat-lbl">Lista čekanja → potvrđena</div>
+      </div>
+
+      <div class="brzi-checkin">
+        <div class="col-title" style="margin-bottom:12px;">Brzi check-in</div>
+        <div class="qr-box" *ngIf="!showRucniUnos">
+          <div class="qr-icon"><lucide-icon name="qr-code" [size]="40" [strokeWidth]="1.5"></lucide-icon></div>
+          <div class="text-muted">Skeniraj članski kod ili unesi ID broj</div>
+        </div>
+        <div class="rucni-form" *ngIf="showRucniUnos">
+          <input
+            class="search-input"
+            placeholder="Ime, prezime ili broj članske..."
+            [(ngModel)]="rucniInput"
+            (keyup.enter)="rucniCheckIn()"
+            autofocus>
+          <div class="rucni-error" *ngIf="rucniGreska">{{ rucniGreska }}</div>
+          <button class="btn-primary w-full" (click)="rucniCheckIn()" [disabled]="!selectedTermin">
+            <lucide-icon name="log-in" [size]="14" [strokeWidth]="2"></lucide-icon> Check-in
+          </button>
+        </div>
+        <button class="btn-outline w-full" (click)="showRucniUnos = !showRucniUnos; rucniGreska = ''">
+          {{ showRucniUnos ? 'Otkaži' : 'Ručni unos' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

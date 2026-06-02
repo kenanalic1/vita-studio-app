@@ -1,0 +1,81 @@
+<div class="page-header">
+  <div class="page-title-group">
+    <div class="page-date">Glavno</div>
+    <div class="page-title">Kalendar</div>
+  </div>
+  <div class="header-actions">
+    <button class="btn-primary" (click)="showNoviTermin = true">+ Novi termin</button>
+  </div>
+</div>
+
+<div class="page-body">
+  <!-- Navigacija -->
+  <div class="nav-bar">
+    <button class="nav-btn" (click)="prevNedelja()">←</button>
+    <div class="nav-title">
+      {{ dani[0]?.date | date:'d. MMM' }} — {{ dani[6]?.date | date:'d. MMM yyyy.' }}
+    </div>
+    <button class="nav-btn" (click)="nextNedelja()">→</button>
+    <button class="btn-outline-sm" (click)="danas()">Danas</button>
+
+    <div class="filter-wrap" style="margin-left:auto;">
+      <select class="select-filter" [(ngModel)]="filterAktivnost" (change)="onFilterChange()">
+        <option value="">Sve aktivnosti</option>
+        <option *ngFor="let a of aktivnosti" [value]="a.naziv">{{ a.naziv }}</option>
+      </select>
+      <select class="select-filter" [(ngModel)]="filterTrener" (change)="onFilterChange()">
+        <option value="">Svi treneri</option>
+        <option *ngFor="let t of treneri" [value]="t.id">{{ t.ime }} {{ t.prezime }}</option>
+      </select>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading">Učitava se...</div>
+
+  <!-- Nedeljni grid -->
+  <div class="nedelja-grid" *ngIf="!loading">
+    <div *ngFor="let dan of dani" class="dan-col">
+      <div class="dan-header" [class.today]="isToday(dan.date)">
+        <div class="dan-naziv">{{ dan.date | date:'EEE' | uppercase }}</div>
+        <div class="dan-broj">{{ dan.date | date:'dd.MM' }}</div>
+      </div>
+      <div class="dan-termini">
+        <div *ngFor="let t of dan.termini"
+             class="termin-blok"
+             [style.background]="getTerminColor(t.aktivnostNaziv)"
+             [style.borderLeft]="'3px solid ' + getTerminBorder(t.aktivnostNaziv)">
+          <div class="tb-vreme">{{ t.datumVreme | date:'HH:mm' }}</div>
+          <div class="tb-naziv">{{ t.aktivnostNaziv }}</div>
+          <div class="tb-meta">{{ t.trenerImePrezime }}</div>
+          <div class="tb-fill">{{ t.brojRezervacija }}/{{ t.maxKapacitet }}</div>
+          <div class="tb-actions">
+            <button class="tb-btn edit" title="Uredi" (click)="openEdit(t); $event.stopPropagation()"><lucide-icon name="pencil" [size]="14" [strokeWidth]="2"></lucide-icon></button>
+            <button class="tb-btn del"  title="Obriši" (click)="deleteTermin(t); $event.stopPropagation()"><lucide-icon name="trash-2" [size]="14" [strokeWidth]="2"></lucide-icon></button>
+          </div>
+        </div>
+        <div *ngIf="dan.termini.length === 0" class="dan-empty"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Legenda -->
+  <div class="legenda">
+    <div class="leg-item"><div class="leg-dot" style="background:#86efac"></div> Joga</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#f9a8d4"></div> Pilates</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#fdba74"></div> Aerobik / Zumba</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#c4b5fd"></div> Meditacija / Yin</div>
+  </div>
+</div>
+
+<app-novi-termin-modal
+  *ngIf="showNoviTermin"
+  (zatvori)="showNoviTermin = false"
+  (sacuvano)="onTerminSacuvan()">
+</app-novi-termin-modal>
+
+<app-novi-termin-modal
+  *ngIf="showEditTermin"
+  [terminEdit]="editTermin"
+  (zatvori)="showEditTermin = false; editTermin = null"
+  (sacuvano)="onTerminSacuvan()">
+</app-novi-termin-modal>

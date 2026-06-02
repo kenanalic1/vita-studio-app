@@ -1,0 +1,47 @@
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">V</div>
+      <div class="logo-text">
+        Vita Studio
+        <div class="logo-sub">Novi Pazar</div>
+      </div>
+    </div>
+
+    <span class="sidebar-section-label">VITA STUDIO</span>
+    <nav>
+      <a routerLink="/clan/pocetna" routerLinkActive="active">
+        <lucide-icon class="nav-icon" name="home" [size]="16" [strokeWidth]="2"></lucide-icon> Početna
+      </a>
+      <a routerLink="/clan/raspored" routerLinkActive="active">
+        <lucide-icon class="nav-icon" name="calendar" [size]="16" [strokeWidth]="2"></lucide-icon> Raspored
+      </a>
+      <a routerLink="/clan/rezervacije" routerLinkActive="active">
+        <lucide-icon class="nav-icon" name="clipboard-list" [size]="16" [strokeWidth]="2"></lucide-icon> Moje rezervacije
+        <span class="badge" *ngIf="brRezervacija > 0">{{ brRezervacija }}</span>
+      </a>
+    </nav>
+
+    <span class="sidebar-section-label">PROFIL</span>
+    <nav>
+      <a routerLink="/clan/profil" routerLinkActive="active">
+        <lucide-icon class="nav-icon" name="user" [size]="16" [strokeWidth]="2"></lucide-icon> Moj profil
+      </a>
+      <a routerLink="/clan/clanarina" routerLinkActive="active">
+        <lucide-icon class="nav-icon" name="credit-card" [size]="16" [strokeWidth]="2"></lucide-icon> Članarina
+      </a>
+    </nav>
+
+    <div class="sidebar-user">
+      <div class="avatar">{{ initials }}</div>
+      <div class="user-info">
+        <div class="user-name">{{ user?.ime }} {{ user?.prezime }}</div>
+        <div class="user-role">Članica</div>
+      </div>
+      <button (click)="logout()" class="logout-btn">→</button>
+    </div>
+  </aside>
+  <main class="main-content">
+  <router-outlet (activate)="onActivate($event)"></router-outlet>
+</main>
+</div>

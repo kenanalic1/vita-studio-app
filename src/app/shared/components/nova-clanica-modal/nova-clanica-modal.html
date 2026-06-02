@@ -1,0 +1,50 @@
+<div class="modal-overlay" (click)="zatvori.emit()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Nova članica</h2>
+      <button class="close-btn" (click)="zatvori.emit()"><lucide-icon name="x" [size]="16" [strokeWidth]="2"></lucide-icon></button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="save()">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Ime</label>
+          <input type="text" formControlName="ime" class="form-input" placeholder="Ime">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Prezime</label>
+          <input type="text" formControlName="prezime" class="form-input" placeholder="Prezime">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" formControlName="email" class="form-input" placeholder="email@example.com">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Lozinka</label>
+        <input type="password" formControlName="lozinka" class="form-input" placeholder="Min. 6 karaktera">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Telefon</label>
+        <input type="text" formControlName="telefon" class="form-input" placeholder="+381 64 ...">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Datum rođenja</label>
+        <input type="date" formControlName="datumRodjenja" class="form-input">
+      </div>
+
+      <div class="error-box" *ngIf="errorMsg">{{ errorMsg }}</div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-outline" (click)="zatvori.emit()">Otkaži</button>
+        <button type="submit" class="btn-primary" [disabled]="form.invalid || saving">
+          {{ saving ? 'Čuva se...' : 'Dodaj članicu' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

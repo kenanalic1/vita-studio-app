@@ -1,0 +1,101 @@
+:host { display: flex; flex-direction: column; flex: 1; overflow: hidden; min-height: 0; }
+.page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 28px; border-bottom: 1px solid #e5e7eb; background: #fff;
+  .page-date  { font-size: 11px; color: #6b7280; margin-bottom: 2px; }
+  .page-title { font-size: 22px; font-weight: 700; }
+  .header-actions { display: flex; gap: 10px; align-items: center; }
+}
+
+.page-body { flex: 1; overflow-y: auto; padding: 20px 28px; }
+
+.btn-primary {
+  background: #7c3aed; color: #fff; border: none;
+  border-radius: 8px; padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer;
+}
+
+.view-tabs {
+  display: flex; border: 1.5px solid #e5e7eb; border-radius: 8px; overflow: hidden;
+  button {
+    padding: 7px 14px; background: transparent; border: none;
+    border-right: 1.5px solid #e5e7eb; font-size: 12px; font-weight: 500; cursor: pointer;
+    &:last-child { border-right: none; }
+    &.active { background: #7c3aed; color: #fff; }
+  }
+}
+
+.nav-bar {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+}
+
+.nav-btn {
+  width: 32px; height: 32px; border: 1.5px solid #e5e7eb;
+  border-radius: 8px; background: transparent; cursor: pointer; font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  &:hover { border-color: #7c3aed; color: #7c3aed; }
+}
+
+.nav-title { font-size: 15px; font-weight: 600; }
+
+.btn-outline-sm {
+  padding: 6px 12px; font-size: 12px; border: 1.5px solid #e5e7eb;
+  border-radius: 6px; background: transparent; cursor: pointer;
+  &:hover { border-color: #7c3aed; color: #7c3aed; }
+}
+
+.select-filter {
+  padding: 6px 10px; border: 1.5px solid #e5e7eb;
+  border-radius: 6px; font-size: 12px; outline: none;
+}
+
+.filter-wrap { display: flex; gap: 8px; }
+
+.nedelja-grid {
+  display: grid; grid-template-columns: repeat(7,1fr);
+  gap: 8px; margin-bottom: 16px;
+}
+
+.dan-col { min-height: 400px; }
+
+.dan-header {
+  text-align: center; padding: 8px 4px; margin-bottom: 8px;
+  border-radius: 8px; background: #f9fafb;
+  &.today { background: #7c3aed; color: #fff; }
+  .dan-naziv { font-size: 10px; font-weight: 600; letter-spacing: .05em; }
+  .dan-broj  { font-size: 13px; font-weight: 700; }
+}
+
+.dan-termini { display: flex; flex-direction: column; gap: 6px; }
+
+.termin-blok {
+  border-radius: 6px; padding: 8px;
+  cursor: default; transition: box-shadow .15s;
+  &:hover { box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+  .tb-vreme { font-size: 11px; font-weight: 700; color: #374151; }
+  .tb-naziv { font-size: 11px; font-weight: 600; margin: 2px 0; }
+  .tb-meta  { font-size: 10px; color: #6b7280; }
+  .tb-fill  { font-size: 10px; color: #9ca3af; margin-top: 2px; }
+
+  .tb-actions {
+    display: none; margin-top: 6px; gap: 4px; justify-content: flex-end;
+  }
+  &:hover .tb-actions { display: flex; }
+
+  .tb-btn {
+    background: rgba(255,255,255,.85); border: 1px solid #d1d5db;
+    border-radius: 4px; padding: 2px 6px; font-size: 11px;
+    cursor: pointer; line-height: 1.4;
+    &:hover { border-color: #7c3aed; }
+    &.del:hover { border-color: #ef4444; color: #ef4444; }
+  }
+}
+
+.dan-empty { height: 40px; }
+
+.legenda {
+  display: flex; gap: 16px; margin-top: 8px;
+  .leg-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #6b7280; }
+  .leg-dot  { width: 10px; height: 10px; border-radius: 50%; }
+}
+
+.loading { padding: 40px; text-align: center; color: #9ca3af; }

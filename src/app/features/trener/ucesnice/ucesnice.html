@@ -1,0 +1,73 @@
+<div class="page-header">
+  <div class="page-title-group">
+    <div class="page-date">Trener panel</div>
+    <div class="page-title">Moje učesnice</div>
+  </div>
+  <input class="search-input" placeholder="Pretraga po imenu ili emailu..."
+         [(ngModel)]="searchTerm">
+</div>
+
+<div class="page-body">
+
+  <!-- Stats trake -->
+  <div class="stats-row" *ngIf="!loading">
+    <div class="stat-chip">
+      <span class="stat-num">{{ ukupnoUcesnica }}</span>
+      <span class="stat-lbl">Učesnica ukupno</span>
+    </div>
+    <div class="stat-chip purple">
+      <span class="stat-num">{{ ukupnoSesija }}</span>
+      <span class="stat-lbl">Aktivnih rezervacija</span>
+    </div>
+    <div class="stat-chip green">
+      <span class="stat-num">{{ filtered.length }}</span>
+      <span class="stat-lbl">Prikazano</span>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading">Učitava se...</div>
+
+  <!-- Tabela učesnica -->
+  <div class="card" *ngIf="!loading">
+    <table class="vs-table">
+      <thead>
+        <tr>
+          <th>Učesnica</th>
+          <th>Email</th>
+          <th>Aktivnosti</th>
+          <th>Sesija</th>
+          <th>Posljednji termin</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let u of filtered">
+          <td>
+            <div class="ime-cell">
+              <div class="avatar">{{ getInitials(u.imePrezime) }}</div>
+              <strong>{{ u.imePrezime }}</strong>
+            </div>
+          </td>
+          <td class="text-muted">{{ u.email }}</td>
+          <td>
+            <div class="tags-wrap">
+              <span *ngFor="let a of u.aktivnosti"
+                    class="akt-tag"
+                    [style.background]="getAktivnostColor(a)">
+                {{ a }}
+              </span>
+            </div>
+          </td>
+          <td>
+            <span class="sesija-badge">{{ u.brojSesija }}</span>
+          </td>
+          <td class="text-muted">{{ u.poslednjiTermin | date:'dd.MM.yyyy · HH:mm' }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="filtered.length === 0" class="empty">
+      {{ searchTerm ? 'Nema rezultata za "' + searchTerm + '".' : 'Nemate učesnica sa aktivnim rezervacijama.' }}
+    </div>
+  </div>
+
+</div>

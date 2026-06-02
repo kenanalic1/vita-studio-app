@@ -1,0 +1,51 @@
+<div class="page-header">
+  <div class="page-title-group">
+    <div class="page-date">Ponuda</div>
+    <div class="page-title">Sale i tereni</div>
+  </div>
+<button class="btn-primary" (click)="showNovaSala = true">+ Nova sala</button></div>
+
+<div class="page-body">
+  <div *ngIf="loading" class="loading">Učitava se...</div>
+  <div class="sale-grid" *ngIf="!loading">
+    <div *ngFor="let s of sale" class="sala-card">
+      <div class="sala-header">
+        <div class="sala-icon"><lucide-icon name="building-2" [size]="18" [strokeWidth]="2"></lucide-icon></div>
+        <div>
+          <div class="sala-naziv">{{ s.naziv }}</div>
+          <span class="tag tag-blue">{{ s.tip }}</span>
+        </div>
+      </div>
+      <div class="sala-stats">
+        <div class="sala-stat">
+          <div class="stat-num">{{ s.kapacitet }}</div>
+          <div class="stat-lbl">Kapacitet</div>
+        </div>
+        <div class="sala-stat">
+          <div class="stat-num">{{ s.terminiNed ?? 0 }}</div>
+          <div class="stat-lbl">Termina ned.</div>
+        </div>
+        <div class="sala-stat">
+          <div class="stat-num">{{ s.popunjenost ?? 0 }}%</div>
+          <div class="stat-lbl">Popunjenost</div>
+        </div>
+      </div>
+      <div class="sala-actions">
+        <button class="btn-icon-sm" (click)="openEdit(s)" title="Uredi"><lucide-icon name="pencil" [size]="14" [strokeWidth]="2"></lucide-icon></button>
+        <button class="btn-icon-sm danger" (click)="deleteSala(s)" title="Obriši"><lucide-icon name="trash-2" [size]="14" [strokeWidth]="2"></lucide-icon></button>
+      </div>
+    </div>
+  </div>
+</div>
+<app-nova-sala-modal
+  *ngIf="showNovaSala"
+  (zatvori)="showNovaSala = false"
+  (sacuvano)="onSalaSacuvana()">
+</app-nova-sala-modal>
+
+<app-nova-sala-modal
+  *ngIf="showEditSala"
+  [salaEdit]="editSala"
+  (zatvori)="showEditSala = false; editSala = null"
+  (sacuvano)="onSalaSacuvana()">
+</app-nova-sala-modal>

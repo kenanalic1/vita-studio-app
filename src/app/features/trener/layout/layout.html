@@ -1,0 +1,43 @@
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">V</div>
+      <div class="logo-text">
+        Vita Studio
+        <div class="logo-sub">Novi Pazar</div>
+      </div>
+    </div>
+
+    <span class="sidebar-section-label">GLAVNO</span>
+    <nav>
+      <a routerLink="/trener/pregled"  routerLinkActive="active">
+        <lucide-icon class="nav-icon" name="layout-dashboard" [size]="16" [strokeWidth]="2"></lucide-icon> Moja tabla
+      </a>
+      <a routerLink="/trener/raspored" routerLinkActive="active">
+        <lucide-icon class="nav-icon" name="calendar" [size]="16" [strokeWidth]="2"></lucide-icon> Moj raspored
+      </a>
+      <a routerLink="/trener/checkin"  routerLinkActive="active">
+        <lucide-icon class="nav-icon" name="user-check" [size]="16" [strokeWidth]="2"></lucide-icon> Check-in
+      </a>
+    </nav>
+
+    <span class="sidebar-section-label">UČESNICI</span>
+    <nav>
+      <a routerLink="/trener/ucesnice" routerLinkActive="active">
+        <lucide-icon class="nav-icon" name="users" [size]="16" [strokeWidth]="2"></lucide-icon> Članice
+      </a>
+    </nav>
+
+    <div class="sidebar-user">
+      <div class="avatar">{{ initials }}</div>
+      <div class="user-info">
+        <div class="user-name">{{ user?.ime }} {{ user?.prezime }}</div>
+        <div class="user-role">Trener{{ specijalizacija ? ' · ' + specijalizacija : '' }}</div>
+      </div>
+      <button (click)="logout()" class="logout-btn">→</button>
+    </div>
+  </aside>
+ <main class="main-content">
+  <router-outlet (activate)="onActivate($event)"></router-outlet>
+</main>
+</div>

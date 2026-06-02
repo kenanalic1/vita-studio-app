@@ -1,0 +1,114 @@
+<div class="page-header">
+  <div class="page-title-group">
+    <div class="page-date">{{ today | date:'EEEE, d. MMMM yyyy.' }}</div>
+    <div class="page-title">Dobrodošla, {{ userName }}</div>
+  </div>
+  <app-notifikacije></app-notifikacije>
+  <button class="btn-primary" routerLink="/trener/checkin"><lucide-icon name="log-in" [size]="14" [strokeWidth]="2"></lucide-icon> Otvori check-in</button>
+</div>
+
+<div class="page-body">
+  <div class="grid-4" *ngIf="!loading">
+    <div class="stat-card">
+      <div class="stat-label">Termini ove nedelje</div>
+      <div class="stat-value">{{ pregled?.terminiOveNedelje }}</div>
+      <div class="stat-sub">{{ pregled?.popunjenihTermina }} popunjena</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Učesnice danas</div>
+      <div class="stat-value">{{ pregled?.ucesniceDanas }}</div>
+      <div class="stat-sub green">↑ +{{ pregled?.rastVsProslaNed }} vs. prošla ned.</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Prosečna popunjenost</div>
+      <div class="stat-value">{{ pregled?.prosecnaPopunjenost }}%</div>
+      <div class="stat-sub green">odlična</div>
+    </div>
+    <div class="stat-card purple">
+      <div class="stat-label">Lista čekanja · ukupno</div>
+      <div class="stat-value">{{ pregled?.ukupnoNaListiCekanja }}</div>
+      <div class="stat-sub">{{ pregled?.terminaSaListom }} termina</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">
+          Moj raspored danas
+          <small class="text-muted">{{ pregled?.rasporedDanas?.length }} termina</small>
+        </span>
+        <button class="btn-outline-sm" routerLink="/trener/raspored">Cela nedelja →</button>
+      </div>
+
+      <div *ngIf="loading" class="loading">Učitava se...</div>
+
+      <div *ngFor="let t of pregled?.rasporedDanas" class="termin-row">
+        <div class="termin-bar" [style.background]="getBarColor(t.aktivnostNaziv)"></div>
+        <div class="termin-body">
+          <div class="termin-top">
+            <strong class="termin-vreme">{{ t.datumVreme | date:'HH:mm' }}</strong>
+            <span class="tag tag-purple">{{ t.aktivnostNaziv }}</span>
+            <span class="tag tag-green" *ngIf="isCompleted(t.datumVreme)"><lucide-icon name="check" [size]="12" [strokeWidth]="2.5"></lucide-icon> završeno</span>
+          </div>
+          <div class="termin-meta">{{ t.salaNaziv }} · {{ t.brojRezervacija }}/{{ t.maxKapacitet }} učesnica</div>
+          <div class="progress-bar">
+            <div class="fill" [style.width.%]="getPercent(t.brojRezervacija, t.maxKapacitet)"></div>
+          </div>
+        </div>
+        <div class="termin-actions">
+          <button class="btn-outline-sm"
+                  [class.active-exp]="expandedTerminId === t.id"
+                  (click)="toggleUcesnice(t.id)">
+            <lucide-icon name="users" [size]="14" [strokeWidth]="2"></lucide-icon> Učesnice
+            <lucide-icon *ngIf="expandedTerminId === t.id" name="chevron-up" [size]="14" [strokeWidth]="2"></lucide-icon>
+            <lucide-icon *ngIf="expandedTerminId !== t.id" name="chevron-down" [size]="14" [strokeWidth]="2"></lucide-icon>
+          </button>
+          <button class="btn-outline-sm" routerLink="/trener/checkin"><lucide-icon name="log-in" [size]="14" [strokeWidth]="2"></lucide-icon> Check-in</button>
+        </div>
+
+        <!-- Expand: lista prijavljenih -->
+        <div class="ucesnice-expand" *ngIf="expandedTerminId === t.id">
+          <div class="ue-loading" *ngIf="loadingExp.has(t.id)">Učitava se...</div>
+          <ng-container *ngIf="!loadingExp.has(t.id)">
+            <div *ngIf="getUcesnice(t.id).length === 0" class="ue-empty">
+              Nema prijavljenih učesnica.
+            </div>
+            <div *ngFor="let r of getUcesnice(t.id); let i = index" class="ue-row">
+              <span class="ue-num">{{ i + 1 }}</span>
+              <div class="ue-avatar">{{ getInitials(r.clanImePrezime) }}</div>
+              <span class="ue-ime">{{ r.clanImePrezime }}</span>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+
+      <div *ngIf="!loading && !pregled?.rasporedDanas?.length" class="empty">
+        Nema termina danas.
+      </div>
+    </div>
+
+    <div class="right-col">
+      <div class="card">
+        <div class="card-title">Ova nedelja</div>
+        <div *ngFor="let t of pregled?.rasporedNedelja | slice:0:5" class="nedelja-row">
+          <div>
+            <div class="nedelja-naziv">{{ t.aktivnostNaziv }}</div>
+            <div class="text-muted">{{ t.datumVreme | date:'EEE dd.MM · HH:mm' }}</div>
+          </div>
+          <span class="text-muted">{{ t.brojRezervacija }} / {{ t.maxKapacitet }}</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Tvoje aktivnosti</div>
+        <div class="spec-tags">
+          <span class="tag tag-purple" *ngFor="let s of pregled?.specijalizacije">{{ s }}</span>
+        </div>
+        <div class="text-muted" style="margin-top:8px;">
+          Specijalizacija: <strong>{{ pregled?.specijalizacije?.join(' / ') }}</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

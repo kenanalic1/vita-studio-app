@@ -1,0 +1,146 @@
+<div class="page-header">
+  <div class="page-title-group">
+    <div class="page-date">Profil</div>
+    <div class="page-title">Članarina</div>
+  </div>
+</div>
+
+<div class="page-body" *ngIf="!loading">
+
+  <!-- ===== AKTIVNA ČLANARINA ===== -->
+  <ng-container *ngIf="aktivna">
+
+    <!-- Upozorenje — uskoro ističe -->
+    <div class="alert-istice" *ngIf="isIskoro">
+      <lucide-icon name="alert-triangle" [size]="16" [strokeWidth]="2"></lucide-icon> Vaša članarina ističe za <strong>{{ daysLeft }} {{ daysLeft === 1 ? 'dan' : 'dana' }}</strong>.
+      Nakon isteka možete odabrati novi paket.
+    </div>
+
+    <div class="aktivna-card">
+      <div class="aktivna-header">
+        <div>
+          <div class="aktivna-label">AKTIVNA ČLANARINA</div>
+          <div class="aktivna-naziv">{{ aktivna.nazivPaketa }}</div>
+          <span class="tip-badge">{{ getTipLabel(aktivna.tipPaketa) }}</span>
+        </div>
+        <div class="aktivna-cena">{{ aktivna.cena | number:'1.0-0' }} RSD</div>
+      </div>
+
+      <div class="aktivna-datumi">
+        <div class="datum-box">
+          <div class="datum-label">Početak</div>
+          <div class="datum-val">{{ aktivna.datumPocetka | date:'d. MMM yyyy.' }}</div>
+        </div>
+        <div class="datum-box">
+          <div class="datum-label">Ističe</div>
+          <div class="datum-val">{{ aktivna.datumIsteka | date:'d. MMM yyyy.' }}</div>
+        </div>
+        <div class="datum-box">
+          <div class="datum-label">Preostalo</div>
+          <div class="datum-val" [class.highlight-red]="isIskoro" [class.highlight]="!isIskoro">
+            {{ daysLeft }} dana
+          </div>
+        </div>
+      </div>
+
+      <div class="progress-wrap">
+        <div class="progress-bar">
+          <div class="fill" [style.width.%]="progress" [style.background]="progressColor"></div>
+        </div>
+        <span class="progress-label">{{ progress }}% iskorišćeno</span>
+      </div>
+
+      <div class="ukljuceno">
+        <span class="uk-icon"><lucide-icon name="check" [size]="14" [strokeWidth]="2.5"></lucide-icon></span> Pristup svim grupnim aktivnostima
+        <span class="uk-icon"><lucide-icon name="check" [size]="14" [strokeWidth]="2.5"></lucide-icon></span> Rezervacija termina
+        <span class="uk-icon"><lucide-icon name="check" [size]="14" [strokeWidth]="2.5"></lucide-icon></span> Praćenje dolazaka
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- ===== PAKETI — prikazati kada nema aktivne ===== -->
+  <ng-container *ngIf="!aktivna">
+    <div class="no-header">
+      <div class="no-title">Odaberite paket</div>
+      <div class="no-sub">Sve aktivnosti uključene · Odmah aktivno · Bez skrivenih naknada</div>
+    </div>
+
+    <div class="paketi-grid">
+      <div *ngFor="let p of paketi"
+           class="paket-card"
+           [class.popular]="p.popular"
+           [class.selected]="selectedPaket?.tip === p.tip"
+           (click)="odaberi(p)">
+
+        <div class="paket-top">
+          <span class="paket-icon"><lucide-icon [name]="p.icon" [size]="24" [strokeWidth]="1.5"></lucide-icon></span>
+          <span class="popular-badge" *ngIf="p.popular">Najpopularnije</span>
+        </div>
+
+        <div class="paket-naziv">{{ p.naziv }}</div>
+        <div class="paket-trajanje">{{ p.trajanjeTekst }}</div>
+        <div class="paket-cena">{{ p.cena | number:'1.0-0' }} <span>RSD</span></div>
+
+        <ul class="paket-lista">
+          <li><lucide-icon name="check" [size]="12" [strokeWidth]="2.5"></lucide-icon> Sve grupne aktivnosti</li>
+          <li><lucide-icon name="check" [size]="12" [strokeWidth]="2.5"></lucide-icon> Neograničene rezervacije</li>
+          <li><lucide-icon name="check" [size]="12" [strokeWidth]="2.5"></lucide-icon> Praćenje napretka</li>
+        </ul>
+
+        <!-- Potvrda unutar kartice -->
+        <div class="potvrda-zona" *ngIf="selectedPaket?.tip === p.tip">
+          <div class="potvrda-info">
+            Danas → {{ datumIstekaZa(p) }}
+          </div>
+          <div class="error-box" *ngIf="errorMsg">{{ errorMsg }}</div>
+          <div class="potvrda-akcije">
+            <button class="btn-otkazi-odabir" (click)="$event.stopPropagation(); odaberi(p)">
+              Otkaži
+            </button>
+            <button class="btn-potvrdi" (click)="$event.stopPropagation(); potvrdi()"
+                    [disabled]="saving">
+              {{ saving ? 'Aktivira se...' : 'Potvrdi odabir' }}
+            </button>
+          </div>
+        </div>
+
+        <button class="btn-odaberi" *ngIf="selectedPaket?.tip !== p.tip"
+                (click)="$event.stopPropagation(); odaberi(p)">
+          Odaberi →
+        </button>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- ===== ISTORIJA ===== -->
+  <div class="card" *ngIf="clanarine.length > 0">
+    <div class="card-title">Istorija članarina</div>
+    <table class="vs-table">
+      <thead>
+        <tr>
+          <th>Paket</th>
+          <th>Tip</th>
+          <th>Početak</th>
+          <th>Istek</th>
+          <th>Cena</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let c of clanarine">
+          <td><strong>{{ c.nazivPaketa }}</strong></td>
+          <td>{{ getTipLabel(c.tipPaketa) }}</td>
+          <td>{{ c.datumPocetka | date:'dd.MM.yyyy' }}</td>
+          <td>{{ c.datumIsteka | date:'dd.MM.yyyy' }}</td>
+          <td>{{ c.cena | number:'1.0-0' }} RSD</td>
+          <td>
+            <span class="tag" [ngClass]="getStatusClass(c.status)">{{ c.status }}</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<div *ngIf="loading" class="loading">Učitava se...</div>

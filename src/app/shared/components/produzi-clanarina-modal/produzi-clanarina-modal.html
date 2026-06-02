@@ -1,0 +1,64 @@
+<div class="modal-overlay" (click)="zatvori.emit()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ clanId ? 'Produži / Nova članarina' : 'Dodaj članarinu' }}</h2>
+      <button class="close-btn" (click)="zatvori.emit()"><lucide-icon name="x" [size]="16" [strokeWidth]="2"></lucide-icon></button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="save()">
+
+      <!-- Odabir članice (samo kada nema clanId) -->
+      <div class="form-group" *ngIf="clanId == null">
+        <label class="form-label">Članica</label>
+        <select formControlName="clanIdSelect" class="form-input">
+          <option [ngValue]="null" disabled>— Odaberi članicu —</option>
+          <option *ngFor="let c of clanice" [ngValue]="c.id">
+            {{ c.ime }} {{ c.prezime }} ({{ c.email }})
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Tip paketa</label>
+        <select formControlName="tipPaketa" class="form-input" (change)="onTipChange()">
+          <option value="mesecna">Mesečna (30 dana)</option>
+          <option value="kvartalna">Kvartalna (90 dana)</option>
+          <option value="godisnja">Godišnja (365 dana)</option>
+          <option value="posebna">Posebna</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Naziv paketa</label>
+        <input type="text" formControlName="nazivPaketa" class="form-input"
+               placeholder="npr. Sve aktivnosti">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Datum početka</label>
+          <input type="date" formControlName="datumPocetka" class="form-input"
+                 (change)="onPocetakChange()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Datum isteka</label>
+          <input type="date" formControlName="datumIsteka" class="form-input">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Cena (RSD)</label>
+        <input type="number" formControlName="cena" class="form-input">
+      </div>
+
+      <div class="error-box" *ngIf="errorMsg">{{ errorMsg }}</div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-outline" (click)="zatvori.emit()">Otkaži</button>
+        <button type="submit" class="btn-primary" [disabled]="form.invalid || saving">
+          {{ saving ? 'Čuva se...' : 'Sačuvaj članarinu' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,65 @@
+<div class="login-shell">
+
+  <div class="login-left">
+    <div class="login-logo">
+      <div class="logo-icon">V</div>
+      <span class="logo-name">Vita Studio</span>
+    </div>
+    <div class="login-hero">
+      <h1>Mesto gde počinje tvoja <em>nova rutina.</em></h1>
+      <p>Joga, pilates, aerobik i još mnogo toga — sve na jednom mestu, u srcu Novog Pazara.</p>
+    </div>
+    <footer class="login-footer">© 2026 Vita Studio · Novi Pazar</footer>
+  </div>
+
+  <div class="login-right">
+    <div class="login-form-wrap">
+      <p class="form-super">DOBRODOŠLA NAZAD</p>
+      <h2>Prijava na sistem</h2>
+      <p class="form-sub">Unesi svoje podatke da nastaviš.</p>
+
+      <div class="role-tabs">
+        <button type="button"
+          [class.active]="selectedRole === 'clan'"
+          (click)="selectRole('clan')">Članica</button>
+        <button type="button"
+          [class.active]="selectedRole === 'trener'"
+          (click)="selectRole('trener')">Trener</button>
+        <button type="button"
+          [class.active]="selectedRole === 'administrator'"
+          (click)="selectRole('administrator')">Administrator</button>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label class="form-label">Email adresa</label>
+          <input type="email" formControlName="email"
+                 class="form-input" placeholder="ime@example.com">
+          <span class="field-error"
+            *ngIf="form.get('email')?.invalid && form.get('email')?.touched">
+            Unesite validan email.
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Lozinka</label>
+          <input type="password" formControlName="lozinka"
+                 class="form-input" placeholder="••••••••">
+        </div>
+
+        <div class="error-box" *ngIf="errorMsg">{{ errorMsg }}</div>
+
+        <button type="submit" class="login-btn"
+                [disabled]="form.invalid || loading">
+          <span *ngIf="!loading">Prijavi se →</span>
+          <span *ngIf="loading">Učitava se...</span>
+        </button>
+      </form>
+
+      <p class="contact-line">
+        Nemaš nalog? <a routerLink="/register">Registruj se</a>
+      </p>
+    </div>
+  </div>
+
+</div>

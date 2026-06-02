@@ -1,0 +1,154 @@
+<div class="page-header">
+  <div class="page-title-group">
+    <div class="page-date">Vita Studio</div>
+    <div class="page-title">Moje rezervacije</div>
+  </div>
+  <app-notifikacije></app-notifikacije>
+</div>
+
+<div class="page-body">
+  <div class="tabs">
+    <button class="tab-btn" [class.active]="activeTab==='predstojeceRezervacije'"
+            (click)="activeTab='predstojeceRezervacije'">
+      Predstojeće · {{ predstojeceRezervacije.length }}
+    </button>
+    <button class="tab-btn" [class.active]="activeTab==='istorija'"
+            (click)="activeTab='istorija'">
+      Istorija
+    </button>
+    <button class="tab-btn" [class.active]="activeTab==='otkazane'"
+            (click)="activeTab='otkazane'">
+      Otkazane
+    </button>
+    <button class="tab-btn" [class.active]="activeTab==='listaCekanja'"
+            (click)="activeTab='listaCekanja'">
+      Lista čekanja
+      <span class="tab-badge" *ngIf="listaCekanja.length > 0">{{ listaCekanja.length }}</span>
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="loading">Učitava se...</div>
+
+  <div *ngIf="!loading">
+
+    <!-- Predstojeće i Otkazane — kartice -->
+    <ng-container *ngIf="activeTab !== 'istorija' && activeTab !== 'listaCekanja'">
+      <ng-container *ngFor="let r of activeList">
+        <div class="rez-card"
+             [style.borderLeft]="activeTab==='predstojeceRezervacije' ?
+               (r.terminDatumVreme | date:'E') === 'Mon' ? '4px solid #fcd34d' :
+               '4px solid #a78bfa' : '4px solid #e5e7eb'">
+
+          <div class="rez-date">
+            <small>{{ getDayOfWeek(r.terminDatumVreme) }}</small>
+            <strong>{{ r.terminDatumVreme | date:'dd.MM.yyyy' }}</strong>
+            <span class="rez-time">{{ r.terminDatumVreme | date:'HH:mm' }}</span>
+          </div>
+
+          <div class="rez-info">
+            <div class="rez-naziv">{{ r.aktivnostNaziv }}</div>
+            <div class="rez-meta">
+              <lucide-icon name="map-pin" [size]="12" [strokeWidth]="2"></lucide-icon> {{ r.trenerImePrezime }} · <lucide-icon name="map-pin" [size]="12" [strokeWidth]="2"></lucide-icon> {{ r.salaNaziv }}
+            </div>
+            <span class="tag" [ngClass]="getStatusClass(r.status)">
+              {{ getStatusLabel(r.status) }}
+            </span>
+          </div>
+
+          <div class="rez-actions" *ngIf="activeTab==='predstojeceRezervacije'">
+            <button class="btn-outline-sm" (click)="toggleDetalji(r.id)">
+              {{ expandedId === r.id ? 'Zatvori' : 'Detalji' }}
+            </button>
+            <button class="btn-otkazi" (click)="otkazi(r.id)"><lucide-icon name="x" [size]="14" [strokeWidth]="2"></lucide-icon> Otkaži</button>
+          </div>
+        </div>
+
+        <div class="rez-detalji" *ngIf="expandedId === r.id">
+          <div class="detalji-row"><span>Aktivnost</span><strong>{{ r.aktivnostNaziv }}</strong></div>
+          <div class="detalji-row"><span>Trener</span><strong>{{ r.trenerImePrezime }}</strong></div>
+          <div class="detalji-row"><span>Sala</span><strong>{{ r.salaNaziv }}</strong></div>
+          <div class="detalji-row">
+            <span>Datum</span>
+            <strong>{{ r.terminDatumVreme | date:'EEEE, d. MMMM yyyy.' }}</strong>
+          </div>
+          <div class="detalji-row">
+            <span>Vreme</span>
+            <strong>{{ r.terminDatumVreme | date:'HH:mm' }}</strong>
+          </div>
+          <div class="detalji-row">
+            <span>Status</span>
+            <span class="tag" [ngClass]="getStatusClass(r.status)">{{ getStatusLabel(r.status) }}</span>
+          </div>
+        </div>
+      </ng-container>
+    </ng-container>
+
+    <!-- Istorija tabela -->
+    <div class="card" *ngIf="activeTab==='istorija' && istorija.length > 0" style="margin-top:24px;">
+      <div class="card-title">Skorašnje aktivnosti</div>
+      <table class="vs-table">
+        <thead>
+          <tr>
+            <th>Datum</th>
+            <th>Aktivnost</th>
+            <th>Vreme</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of istorija">
+            <td>{{ r.terminDatumVreme | date:'EEE · dd.MM.yyyy' }}</td>
+            <td>{{ r.aktivnostNaziv }}</td>
+            <td>{{ r.terminDatumVreme | date:'HH:mm' }}</td>
+            <td>
+              <span class="tag" [ngClass]="getStatusClass(r.status)">
+                {{ getStatusLabel(r.status) }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Lista čekanja -->
+    <ng-container *ngIf="activeTab==='listaCekanja'">
+      <div class="lc-info" *ngIf="listaCekanja.length > 0">
+        Kada neko otkaže rezervaciju, automatski ćeš biti premještena na listu.
+      </div>
+
+      <div class="rez-card lc-card" *ngFor="let l of listaCekanja">
+        <div class="lc-pozicija">
+          <span class="pozicija-num">{{ l.pozicija }}</span>
+          <span class="pozicija-lbl">u redu</span>
+        </div>
+
+        <div class="rez-date">
+          <small>{{ getDayOfWeek(l.terminDatumVreme) }}</small>
+          <strong>{{ l.terminDatumVreme | date:'dd.MM.yyyy' }}</strong>
+          <span class="rez-time">{{ l.terminDatumVreme | date:'HH:mm' }}</span>
+        </div>
+
+        <div class="rez-info">
+          <div class="rez-naziv">{{ l.aktivnostNaziv }}</div>
+          <div class="rez-meta">Prijavljena {{ l.datumPrijave | date:'dd.MM.yyyy' }}</div>
+          <span class="tag tag-yellow"><lucide-icon name="clock" [size]="12" [strokeWidth]="2"></lucide-icon> na listi čekanja</span>
+        </div>
+
+        <div class="rez-actions">
+          <button class="btn-otkazi" (click)="otkaziListu(l.id)"><lucide-icon name="x" [size]="14" [strokeWidth]="2"></lucide-icon> Skini se</button>
+        </div>
+      </div>
+    </ng-container>
+
+    <div *ngIf="activeTab !== 'istorija' && activeList.length === 0 && activeTab !== 'listaCekanja'" class="empty">
+      Nema rezervacija u ovoj kategoriji.
+    </div>
+    <div *ngIf="activeTab === 'istorija' && istorija.length === 0" class="empty">
+      Nemate prethodnih posjeta.
+    </div>
+    <div *ngIf="activeTab === 'listaCekanja' && listaCekanja.length === 0" class="empty">
+      Niste na listi čekanja ni za jedan termin.
+    </div>
+
+  </div>
+</div>

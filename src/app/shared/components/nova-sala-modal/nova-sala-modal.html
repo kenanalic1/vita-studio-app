@@ -1,0 +1,38 @@
+<div class="modal-overlay" (click)="zatvori.emit()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ salaEdit ? 'Uredi salu' : 'Nova sala' }}</h2>
+      <button class="close-btn" (click)="zatvori.emit()"><lucide-icon name="x" [size]="16" [strokeWidth]="2"></lucide-icon></button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="save()">
+      <div class="form-group">
+        <label class="form-label">Naziv sale</label>
+        <input type="text" formControlName="naziv" class="form-input" placeholder="npr. Studio Lotus">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Kapacitet</label>
+        <input type="number" formControlName="kapacitet" class="form-input" placeholder="npr. 16">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Tip</label>
+        <select formControlName="tip" class="form-input">
+          <option value="sala">Sala</option>
+          <option value="teretana">Teretana</option>
+          <option value="teren">Teren</option>
+        </select>
+      </div>
+
+      <div class="error-box" *ngIf="errorMsg">{{ errorMsg }}</div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-outline" (click)="zatvori.emit()">Otkaži</button>
+        <button type="submit" class="btn-primary" [disabled]="form.invalid || saving">
+          {{ saving ? 'Čuva se...' : (salaEdit ? 'Sačuvaj izmjene' : 'Dodaj salu') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

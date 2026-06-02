@@ -1,0 +1,141 @@
+<div class="page-header">
+  <div class="page-title-group">
+    <div class="page-date">Pregled · {{ today | date:'EEEE, d. MMMM yyyy.' }}</div>
+    <div class="page-title">Dobrodošla, {{ userName }}</div>
+  </div>
+  <div class="header-actions">
+    <app-notifikacije></app-notifikacije>
+    <button class="btn-primary" (click)="showNoviTermin = true">+ Novi termin</button>
+  </div>
+</div>
+
+<div class="page-body">
+
+  <!-- Stat kartice -->
+  <div class="grid-4" *ngIf="!loading">
+    <div class="stat-card">
+      <div class="stat-label">Prihod ovog meseca</div>
+      <div class="stat-value">{{ formatPrihod(pregled?.prihodOvogMeseca ?? 0) }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Aktivne članice</div>
+      <div class="stat-value">{{ pregled?.aktivneClanice }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Popunjenost termina</div>
+      <div class="stat-value">{{ pregled?.popunjenostTermina }}%</div>
+    </div>
+    <div class="stat-card yellow">
+      <div class="stat-label">Ističe s 7 dana</div>
+      <div class="stat-value">{{ pregled?.istekleZa7Dana }}</div>
+      <div class="stat-sub">članarina · pošalji podsetnik</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <!-- Današnji raspored -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Današnji raspored</span>
+        <div class="btn-group">
+          <button class="btn-outline-sm active">Danas</button>
+          <button class="btn-outline-sm" routerLink="/admin/kalendar">Cela nedelja</button>
+        </div>
+      </div>
+
+      <div *ngIf="loading" class="skeleton-list">
+        <div class="skeleton-row"></div>
+        <div class="skeleton-row"></div>
+        <div class="skeleton-row"></div>
+      </div>
+
+      <div *ngFor="let t of pregled?.danasnjiRaspored" class="termin-row">
+        <div class="termin-time">
+          <strong>{{ t.datumVreme | date:'HH:mm' }}</strong>
+          <small>{{ t.trajanje }} min</small>
+        </div>
+        <div class="termin-info">
+          <div class="termin-naziv">
+            {{ t.aktivnostNaziv }}
+            <span class="tag tag-purple">grupni</span>
+          </div>
+          <div class="termin-meta"><lucide-icon name="map-pin" [size]="12" [strokeWidth]="2"></lucide-icon> {{ t.trenerImePrezime }} · {{ t.salaNaziv }}</div>
+        </div>
+        <div class="termin-fill">
+          <span class="tag" [ngClass]="getSlotClass(t.brojRezervacija, t.maxKapacitet)">
+            {{ t.brojRezervacija }}/{{ t.maxKapacitet }}
+            <span *ngIf="t.brojNaListiCekanja > 0" class="ceka">
+              +{{ t.brojNaListiCekanja }} čeka
+            </span>
+          </span>
+          <div class="progress-bar">
+            <div class="fill"
+              [class.full]="t.brojRezervacija >= t.maxKapacitet"
+              [style.width.%]="getPopunjenostPercent(t.brojRezervacija, t.maxKapacitet)">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="!loading && pregled?.danasnjiRaspored?.length === 0" class="empty">
+        Nema termina danas.
+      </div>
+    </div>
+
+    <!-- Desna kolona -->
+    <div class="right-col">
+      <!-- Popunjenost nedelje -->
+      <div class="card">
+        <div class="card-title">Popunjenost ove nedelje</div>
+        <div class="week-chart" *ngIf="pregled?.popunjenostNedelje">
+          <div *ngFor="let d of pregled!.popunjenostNedelje" class="week-day">
+            <div class="week-bar-wrap">
+              <div class="week-bar"
+                [style.height.%]="d.procenat"
+                [style.background]="d.procenat > 85 ? '#7c3aed' : '#c4b5fd'">
+              </div>
+            </div>
+            <span class="week-label">{{ d.dan }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Liste čekanja -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Liste čekanja</span>
+          <a routerLink="/admin/rezervacije" class="link-more">Sve →</a>
+        </div>
+        <div *ngFor="let lc of pregled?.listeCekanja" class="lista-row">
+          <div>
+            <div class="lista-naziv">{{ lc.aktivnostNaziv }}</div>
+            <div class="lista-datum">{{ lc.datumVreme | date:'dd.MM.yyyy · HH:mm' }}</div>
+          </div>
+          <span class="tag tag-yellow">{{ lc.brojNaListi }} na čekanju</span>
+        </div>
+        <div *ngIf="!pregled?.listeCekanja?.length" class="empty">Nema lista čekanja.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nedavna aktivnost -->
+  <div class="card" style="margin-top:16px;">
+    <div class="card-title">Nedavna aktivnost</div>
+    <div class="nedavna-grid">
+      <div *ngFor="let a of pregled?.nedavnaAktivnost" class="nedavna-item">
+        <div class="nedavna-dot" [class]="a.tip"></div>
+        <div>
+          <div class="nedavna-tekst">{{ a.tekst }}</div>
+          <div class="nedavna-vreme">{{ a.vreme | date:'d.M.yyyy · HH:mm' }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<app-novi-termin-modal
+  *ngIf="showNoviTermin"
+  (zatvori)="showNoviTermin = false"
+  (sacuvano)="onTerminSacuvan()">
+</app-novi-termin-modal>

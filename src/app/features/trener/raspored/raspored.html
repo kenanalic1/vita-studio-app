@@ -1,0 +1,39 @@
+<div class="page-header">
+  <div class="page-title-group">
+    <div class="page-date">Moj raspored</div>
+    <div class="page-title">Cela nedelja</div>
+  </div>
+</div>
+
+<div class="page-body">
+  <div class="nav-bar">
+    <button class="nav-btn" (click)="prevNedelja()" [disabled]="navigating">←</button>
+    <div class="nav-title">
+      {{ dani[0]?.date | date:'d. MMM' }} — {{ dani[6]?.date | date:'d. MMM yyyy.' }}
+      <span class="nav-loading" *ngIf="navigating">•••</span>
+    </div>
+    <button class="nav-btn" (click)="nextNedelja()" [disabled]="navigating">→</button>
+    <button class="btn-danas" *ngIf="!isCurrentWeek" (click)="danas()" [disabled]="navigating">Danas</button>
+  </div>
+
+  <div *ngIf="loading" class="loading">Učitava se...</div>
+
+  <div class="nedelja-grid" *ngIf="!loading" [class.navigating]="navigating">
+    <div *ngFor="let dan of dani" class="dan-col" [class.past-day]="isPast(dan.date)">
+      <div class="dan-header" [class.today]="isToday(dan.date)">
+        <div class="dan-naziv">{{ dan.date | date:'EEE' | uppercase }}</div>
+        <div class="dan-broj">{{ dan.date | date:'dd.MM' }}</div>
+      </div>
+      <div *ngFor="let t of dan.termini" class="termin-blok">
+        <div class="tb-vreme">{{ t.datumVreme | date:'HH:mm' }}</div>
+        <div class="tb-naziv">{{ t.aktivnostNaziv }}</div>
+        <div class="tb-meta">{{ t.salaNaziv }}</div>
+        <div class="progress-bar">
+          <div class="fill" [style.width.%]="getPercent(t.brojRezervacija, t.maxKapacitet)"></div>
+        </div>
+        <div class="tb-fill">{{ t.brojRezervacija }}/{{ t.maxKapacitet }}</div>
+      </div>
+      <div *ngIf="dan.termini.length === 0" class="dan-empty">—</div>
+    </div>
+  </div>
+</div>

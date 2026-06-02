@@ -1,0 +1,152 @@
+<div class="page-header">
+  <div class="page-title-group">
+    <div class="page-date">{{ today | date:'EEEE, d. MMMM yyyy.' }}</div>
+    <div class="page-title">Zdravo, {{ userName }}!</div>
+  </div>
+  <div class="header-actions">
+    <app-notifikacije></app-notifikacije>
+    <button class="btn-primary" routerLink="/clan/raspored">+ Rezerviši termin</button>
+  </div>
+</div>
+
+<div class="page-body">
+  <div class="main-grid">
+    <div class="left-col">
+
+      <!-- Aktivna clanarina -->
+      <div class="clanarina-card" *ngIf="pocetna?.aktivnaClanarina">
+        <div class="clanarina-label">AKTIVNA ČLANARINA</div>
+        <div class="clanarina-naziv">
+          {{ pocetna!.aktivnaClanarina!.tipPaketa | titlecase }} ·
+          {{ pocetna!.aktivnaClanarina!.nazivPaketa }}
+        </div>
+        <div class="clanarina-stats">
+          <div>
+            <div class="cs-label">Ističe</div>
+            <strong>{{ pocetna!.aktivnaClanarina!.datumIsteka | date:'d. MMM yyyy.' }}</strong>
+          </div>
+          <div>
+            <div class="cs-label">Preostalo</div>
+            <strong>{{ getDaysLeft() }} dana</strong>
+          </div>
+          <div>
+            <div class="cs-label">Dolasci ovog meseca</div>
+            <strong>{{ pocetna!.dolazakaOvogMeseca }}</strong>
+          </div>
+        </div>
+        <div class="progress-bar">
+          <div class="fill" [style.width.%]="getClanarinaProgress()"></div>
+        </div>
+      </div>
+
+      <!-- Upozorenje o clanarina -->
+      <div class="clanarina-warning" *ngIf="!loading && !imAktivnuClanarinu">
+        <span class="warn-icon"><lucide-icon name="alert-triangle" [size]="16" [strokeWidth]="2"></lucide-icon></span>
+        <div class="warn-text">
+          <div class="warn-title">Nemate aktivnu članarinu</div>
+          <div class="warn-sub">Rezervacija termina nije moguća. Kontaktirajte recepciju na
+            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=kenanalicpatike1@gmail.com&su=Obnova+clanarine" target="_blank" rel="noopener">kenanalicpatike1@gmail.com</a> za obnovu.
+          </div>
+        </div>
+      </div>
+
+      <!-- Predstojeći termini -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Predstojeći termini</span>
+          <a routerLink="/clan/rezervacije" class="link-more">Sve →</a>
+        </div>
+        <div *ngIf="loading" class="loading">Učitava se...</div>
+        <div *ngFor="let r of pocetna?.predstojeciTermini" class="predstojeciRow">
+          <div class="predDate">
+            <small>{{ r.terminDatumVreme | date:'EEE' | uppercase }}</small>
+            <strong>{{ r.terminDatumVreme | date:'dd.MM' }}</strong>
+          </div>
+          <div class="predInfo">
+            <span class="tag tag-purple">{{ r.terminDatumVreme | date:'HH:mm' }}</span>
+            <strong style="margin-left:8px;">{{ r.aktivnostNaziv }}</strong>
+            <div class="text-muted">{{ r.salaNaziv }} · <lucide-icon name="map-pin" [size]="12" [strokeWidth]="2"></lucide-icon> {{ r.trenerImePrezime }}</div>
+          </div>
+          <button class="btn-otkazi" (click)="otkazi(r.id)">Otkaži</button>
+        </div>
+        <div *ngIf="!loading && !pocetna?.predstojeciTermini?.length" class="empty">
+          Nema predstoječih termina.
+        </div>
+      </div>
+
+      <!-- Predlozeno -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Predloženo za tebe</span>
+          <div class="predlozeno-filter-wrap">
+            <button class="btn-outline-sm" (click)="showPredlozenoFilter = !showPredlozenoFilter">
+              <lucide-icon name="settings" [size]="14" [strokeWidth]="2"></lucide-icon> {{ predlozenoFilter === 'Sve' ? 'Filter' : predlozenoFilter }}
+            </button>
+            <div class="predlozeno-dropdown" *ngIf="showPredlozenoFilter">
+              <button *ngFor="let a of predlozenoAktivnosti"
+                      class="predlozeno-opt"
+                      [class.active]="predlozenoFilter === a"
+                      (click)="setPredlozenoFilter(a)">
+                {{ a }}
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="predlozeno-grid">
+          <div *ngFor="let t of filteredPredlozeno"
+               class="predlozeno-card"
+               [style.background]="getPredlozenoColor(t.aktivnostNaziv)">
+            <div class="text-muted">{{ t.datumVreme | date:'EEE · HH:mm' }}</div>
+            <div class="pred-naziv">{{ t.aktivnostNaziv }}</div>
+            <div class="text-muted">{{ t.trenerImePrezime }}</div>
+            <div class="pred-footer">
+              <span class="text-muted">{{ t.brojRezervacija }} mesta od {{ t.maxKapacitet }}</span>
+              <button class="btn-primary btn-sm"
+                      [disabled]="!imAktivnuClanarinu || isPast(t.datumVreme)"
+                      [title]="isPast(t.datumVreme) ? 'Termin je već prošao' : ''"
+                      (click)="rezervisi(t.id)">Rezerviši</button>
+            </div>
+          </div>
+          <div *ngIf="filteredPredlozeno.length === 0" class="empty">
+            Nema predloga za izabrani filter.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Desna kolona -->
+    <div class="right-col">
+      <div class="card">
+        <div class="card-title">Tvoja statistika</div>
+        <div class="stat-row">
+          <span class="text-muted">Dolazaka ovaj mesec</span>
+          <strong>{{ pocetna?.dolazakaOvogMeseca }}</strong>
+        </div>
+        <div class="stat-row">
+          <span class="text-muted">Najdraža aktivnost</span>
+          <strong>{{ pocetna?.najdrazaAktivnost || '—' }}</strong>
+        </div>
+        <div class="stat-row">
+          <span class="text-muted">Najduža serija</span>
+          <strong>{{ pocetna?.najduzaSerija }} dana</strong>
+        </div>
+        <div class="stat-row">
+          <span class="text-muted">Članica od</span>
+          <strong>{{ pocetna?.clanOd | date:'MMM yyyy.' }}</strong>
+        </div>
+      </div>
+
+      <div class="referral-card">
+        <div class="referral-title"><lucide-icon name="sparkles" [size]="14" [strokeWidth]="2"></lucide-icon> Pozovi prijateljicu</div>
+        <div class="text-muted" style="margin-bottom:12px;font-size:12px;">
+          Pozovi prijateljicu na probni čas — obe dobijate 20% popusta.
+        </div>
+        <div class="referral-code">{{ referralCode }}</div>
+        <button class="btn-primary w-full" (click)="kopirajKod()">
+          <lucide-icon [name]="kopirano ? 'check' : 'sparkles'" [size]="14" [strokeWidth]="2"></lucide-icon>
+          {{ kopirano ? 'Kopirano!' : 'Kopiraj kod' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

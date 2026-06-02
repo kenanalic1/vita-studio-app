@@ -1,0 +1,109 @@
+<div class="page-header">
+  <div class="page-title-group">
+    <div class="page-date">{{ today | date:'EEEE, d. MMMM yyyy.' }}</div>
+    <div class="page-title">Check-in</div>
+  </div>
+  <input class="search-input" placeholder="Pretraga članice..."
+         [(ngModel)]="searchTerm">
+</div>
+
+<div class="page-body">
+  <div class="checkin-layout">
+
+    <!-- Lijeva kolona - moji termini danas -->
+    <div class="termini-col">
+      <div class="col-title">Moji termini danas</div>
+      <div *ngIf="loading" class="loading">Učitava se...</div>
+      <div *ngFor="let t of terminiDanas"
+           class="termin-item"
+           [class.active]="selectedTermin?.id === t.id"
+           (click)="selectTermin(t)">
+        <div class="termin-vreme">{{ t.datumVreme | date:'HH:mm' }}</div>
+        <div class="termin-info">
+          <div class="termin-naziv">{{ t.aktivnostNaziv }}</div>
+          <div class="text-muted">{{ t.salaNaziv }}</div>
+        </div>
+        <span class="termin-fill">{{ t.brojRezervacija }}/{{ t.maxKapacitet }}</span>
+      </div>
+      <div *ngIf="!loading && terminiDanas.length === 0" class="empty">
+        Nemate termina danas.
+      </div>
+    </div>
+
+    <!-- Srednja kolona - lista prijavljenih -->
+    <div class="lista-col">
+      <div class="lista-header" *ngIf="selectedTermin">
+        <div>
+          <div class="lista-naziv">{{ selectedTermin.aktivnostNaziv }}</div>
+          <div class="text-muted">
+            {{ selectedTermin.datumVreme | date:'HH:mm' }} ·
+            {{ selectedTermin.salaNaziv }}
+          </div>
+        </div>
+        <span class="prijavljeno-badge">
+          Stiglo {{ stigliCount }}/{{ lista.length }}
+        </span>
+      </div>
+
+      <div *ngIf="!selectedTermin && !loading" class="empty">
+        Odaberite termin s lijeve strane.
+      </div>
+
+      <div *ngIf="loadingLista" class="loading">Učitava se lista...</div>
+
+      <div *ngFor="let item of filteredLista"
+           class="checkin-item"
+           [class.stigao]="item.stigao">
+        <div class="ci-avatar" [class.stigao]="item.stigao">
+          {{ getInitials(item.imePrezime) }}
+        </div>
+        <div class="ci-info">
+          <div class="ci-ime">{{ item.imePrezime }}</div>
+          <div class="text-muted">{{ item.statusClanarine }}</div>
+        </div>
+        <span class="tag tag-green" *ngIf="item.stigao"><lucide-icon name="check" [size]="12" [strokeWidth]="2.5"></lucide-icon> stigla</span>
+        <button class="check-btn"
+                [class.checked]="item.stigao"
+                (click)="!item.stigao && checkIn(item.clanId)"
+                [disabled]="item.stigao">
+          <lucide-icon *ngIf="item.stigao" name="check" [size]="14" [strokeWidth]="2.5"></lucide-icon>
+        </button>
+      </div>
+
+      <div *ngIf="!loadingLista && filteredLista.length === 0 && selectedTermin" class="empty">
+        Nema prijavljenih na ovaj termin.
+      </div>
+    </div>
+
+    <!-- Desna kolona - statistika trenera -->
+    <div class="stats-col">
+      <div class="col-title">Danas</div>
+
+      <div class="stat-card">
+        <div class="stat-num">{{ ukupnoTermina }}</div>
+        <div class="stat-lbl">Termina</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-num">{{ ukupnoUcesnica }}</div>
+        <div class="stat-lbl">Prijavljenih učesnica</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-num">{{ stigliCount }}</div>
+        <div class="stat-lbl">Stiglo na ovaj čas</div>
+      </div>
+
+      <div class="progress-card" *ngIf="selectedTermin">
+        <div class="col-title" style="margin-bottom:8px;">Popunjenost</div>
+        <div class="progress-bar">
+          <div class="fill"
+               [style.width.%]="(selectedTermin.brojRezervacija / selectedTermin.maxKapacitet) * 100">
+          </div>
+        </div>
+        <div class="progress-label">
+          {{ selectedTermin.brojRezervacija }} / {{ selectedTermin.maxKapacitet }} mjesta
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

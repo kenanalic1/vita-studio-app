@@ -1,0 +1,84 @@
+<div class="page-header">
+  <div class="page-title-group">
+    <div class="page-date">Ponuda</div>
+    <div class="page-title">Članarine</div>
+  </div>
+  <button class="btn-primary" (click)="otvoriModal()">+ Nova članarina</button>
+</div>
+
+<div class="page-body">
+
+  <!-- Paketi kartice -->
+  <div class="paketi-grid">
+    <div *ngFor="let p of paketi"
+         class="paket-card"
+         [class.highlight]="p.highlight">
+      <div class="paket-top">
+        <span class="paket-icon"><lucide-icon [name]="p.icon" [size]="24" [strokeWidth]="1.5"></lucide-icon></span>
+        <span class="paket-badge" *ngIf="p.highlight">Najpopularnije</span>
+      </div>
+      <div class="paket-naziv">{{ p.naziv }}</div>
+      <div class="paket-trajanje">{{ p.trajanje }}</div>
+      <div class="paket-cena">{{ p.cena | number:'1.0-0' }} <span>RSD</span></div>
+      <div class="paket-opis">{{ p.opis }}</div>
+      <button class="btn-dodaj" (click)="otvoriModal(p)">Dodaj članicu →</button>
+    </div>
+  </div>
+
+  <!-- Filter tabovi -->
+  <div class="filter-bar">
+    <button class="filter-btn" [class.active]="filter==='aktivna'" (click)="filter='aktivna'">
+      Aktivne · {{ counts.aktivna }}
+    </button>
+    <button class="filter-btn" [class.active]="filter==='istekla'" (click)="filter='istekla'">
+      Istekle · {{ counts.istekla }}
+    </button>
+    <button class="filter-btn" [class.active]="filter==='sve'" (click)="filter='sve'">
+      Sve · {{ counts.sve }}
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="loading">Učitava se...</div>
+
+  <div class="card table-card" *ngIf="!loading">
+    <table class="vs-table">
+      <thead>
+        <tr>
+          <th>Članica</th>
+          <th>Paket</th>
+          <th>Tip</th>
+          <th>Početak</th>
+          <th>Istek</th>
+          <th>Cena</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let c of filtered">
+          <td><strong>{{ c.clanImePrezime }}</strong></td>
+          <td>{{ c.nazivPaketa }}</td>
+          <td>{{ c.tipPaketa }}</td>
+          <td>{{ c.datumPocetka | date:'dd.MM.yyyy' }}</td>
+          <td>{{ c.datumIsteka | date:'dd.MM.yyyy' }}</td>
+          <td>{{ c.cena | number:'1.0-0' }} RSD</td>
+          <td>
+            <span class="tag" [ngClass]="getStatusClass(c.status)">
+              {{ c.status }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div *ngIf="filtered.length === 0" class="empty">Nema članarina za ovaj filter.</div>
+  </div>
+
+</div>
+
+<app-produzi-clanarina-modal
+  *ngIf="showModal"
+  [defaultTipPaketa]="modalPaket?.tip ?? 'mesecna'"
+  [defaultCena]="modalPaket?.cena ?? 3000"
+  [defaultNaziv]="modalPaket?.defaultNaziv ?? ''"
+  (zatvori)="showModal = false"
+  (sacuvano)="onSacuvano()">
+</app-produzi-clanarina-modal>

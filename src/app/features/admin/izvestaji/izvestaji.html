@@ -1,0 +1,83 @@
+<div class="page-header">
+  <div class="page-title-group">
+    <div class="page-date">Operativa</div>
+    <div class="page-title">Izveštaji</div>
+  </div>
+  <div class="header-actions">
+    <div class="period-tabs">
+      <button [class.active]="selectedPeriod===3"  (click)="setPeriod(3)">3 meseca</button>
+      <button [class.active]="selectedPeriod===7"  (click)="setPeriod(7)">7 meseci</button>
+      <button [class.active]="selectedPeriod===12" (click)="setPeriod(12)">Godinu dana</button>
+    </div>
+    <button class="btn-outline" (click)="exportPdf()" [disabled]="!izvestaj">↓ PDF</button>
+  </div>
+</div>
+
+<div class="page-body" *ngIf="!loading && izvestaj">
+
+  <!-- Glavne statistike -->
+  <div class="grid-3" style="margin-bottom:24px;">
+    <div class="stat-card">
+      <div class="stat-label">Ukupan prihod ({{ selectedPeriod }}m)</div>
+      <div class="stat-value">{{ formatPrihod(izvestaj.ukupanPrihod) }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Prosečna popunjenost</div>
+      <div class="stat-value">{{ izvestaj.prosecnaPopunjenost }}%</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Retencija članica</div>
+      <div class="stat-value">{{ izvestaj.retencijaClanica }}%</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <!-- Prihod po mesecima -->
+    <div class="card">
+      <div class="card-title">Prihod po mesecima</div>
+      <div class="bar-chart">
+        <div *ngFor="let m of izvestaj.prihodPoMesecima" class="bar-item">
+          <div class="bar-wrap">
+            <div class="bar"
+              [style.height.%]="getBarWidth(m.prihod, maxPrihod)"
+              [title]="formatPrihod(m.prihod)">
+            </div>
+          </div>
+          <span class="bar-label">{{ m.mesec | slice:5:7 }}/{{ m.mesec | slice:2:4 }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top aktivnosti -->
+    <div class="card">
+      <div class="card-title">Top aktivnosti</div>
+      <div *ngFor="let a of izvestaj.topAktivnosti" class="top-row">
+        <div class="top-info">
+          <div class="top-naziv">{{ a.naziv }}</div>
+          <div class="text-muted">{{ a.brojTermina }} termina ovog meseca</div>
+        </div>
+        <div class="top-bar-wrap">
+          <div class="top-bar">
+            <div class="top-fill" [style.width.%]="a.popunjenost"></div>
+          </div>
+          <span class="top-percent">{{ a.popunjenost }}%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Distribucija paketa -->
+  <div class="card" style="margin-top:16px;">
+    <div class="card-title">Distribucija paketa</div>
+    <div class="paketi-grid">
+      <div *ngFor="let p of izvestaj.distribucijaPaketa" class="paket-card">
+        <div class="paket-tip">{{ p.tipPaketa | titlecase }}</div>
+        <div class="paket-broj">{{ p.brojAktivnih }}</div>
+        <div class="text-muted">aktivnih</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div *ngIf="loading" class="loading">Učitava se...</div>

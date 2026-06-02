@@ -1,0 +1,107 @@
+<div class="page-header">
+  <div class="page-title-group">
+    <div class="page-date">Vita Studio</div>
+    <div class="page-title">Raspored</div>
+  </div>
+  <app-notifikacije></app-notifikacije>
+</div>
+
+<div class="page-body">
+  <!-- Upozorenje o clanarina -->
+  <div class="clanarina-warning" *ngIf="!imAktivnuClanarinu">
+    <span class="warn-icon"><lucide-icon name="alert-triangle" [size]="16" [strokeWidth]="2"></lucide-icon></span>
+    <div class="warn-text">
+      <div class="warn-title">Nemate aktivnu članarinu</div>
+      <div class="warn-sub">Rezervacija termina nije moguća. Kontaktirajte recepciju na
+        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=kenanalicpatike1@gmail.com&su=Obnova+clanarine" target="_blank" rel="noopener">kenanalicpatike1@gmail.com</a> za obnovu.
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigacija nedelja -->
+  <div class="nav-nedelja">
+    <button class="nav-btn" (click)="prevNedelja()">←</button>
+    <span class="nav-label">
+      {{ dani[0]?.value | date:'d. MMM' }} — {{ dani[6]?.value | date:'d. MMM yyyy.' }}
+    </span>
+    <button class="nav-btn" (click)="nextNedelja()">→</button>
+  </div>
+
+  <!-- Dani -->
+  <div class="dani-bar">
+    <button *ngFor="let d of dani"
+            class="dan-btn"
+            [class.active]="selectedDan === d.value"
+            (click)="selectDan(d.value)">
+      {{ d.label }}
+    </button>
+  </div>
+
+  <!-- Filter aktivnosti -->
+  <div class="aktivnost-filter">
+    <button *ngFor="let a of aktivnosti"
+            class="filter-chip"
+            [class.active]="aktivnostFilter === a"
+            (click)="setAktivnostFilter(a)">
+      {{ a }}
+    </button>
+    <span class="termini-count">{{ filteredTermini.length }} termina</span>
+  </div>
+
+  <div *ngIf="loading" class="loading">Učitava se...</div>
+
+  <!-- Termini grid -->
+  <div class="termini-grid" *ngIf="!loading">
+    <div *ngFor="let t of filteredTermini"
+         class="termin-card"
+         [style.background]="getCardColor(t.aktivnostNaziv)">
+
+      <div class="termin-top">
+        <span class="tag tag-naziv">{{ t.aktivnostNaziv }}</span>
+        <span class="slot-chip" [ngClass]="getSlotStatus(t)">
+          {{ getSlotStatus(t) === 'popunjeno' ? 'Popunjeno' :
+             getSlotStatus(t) === 'jos-mesta' ? 'Još 2 mesta' : 'Dostupno' }}
+        </span>
+      </div>
+
+      <div class="termin-vreme">
+        {{ t.datumVreme | date:'HH:mm' }}
+        <span class="termin-trajanje">· {{ t.trajanje }} min</span>
+      </div>
+
+      <div class="termin-meta">
+        <span><lucide-icon name="map-pin" [size]="12" [strokeWidth]="2"></lucide-icon> {{ t.trenerImePrezime }}</span>
+        <span><lucide-icon name="map-pin" [size]="12" [strokeWidth]="2"></lucide-icon> {{ t.salaNaziv }}</span>
+      </div>
+
+      <div class="progress-bar">
+        <div class="fill"
+          [class.full]="t.brojRezervacija >= t.maxKapacitet"
+          [style.width.%]="(t.brojRezervacija / t.maxKapacitet) * 100">
+        </div>
+      </div>
+
+      <div class="termin-footer">
+        <span class="slot-text">{{ getSlotLabel(t) }}</span>
+        <button class="btn-primary btn-sm"
+                *ngIf="t.brojRezervacija < t.maxKapacitet"
+                [disabled]="!imAktivnuClanarinu || isPast(t.datumVreme)"
+                [title]="isPast(t.datumVreme) ? 'Termin je već prošao' : ''"
+                (click)="rezervisi(t.id)">
+          Rezerviši
+        </button>
+        <button class="btn-outline-sm"
+                *ngIf="t.brojRezervacija >= t.maxKapacitet"
+                [disabled]="!imAktivnuClanarinu || isPast(t.datumVreme)"
+                [title]="isPast(t.datumVreme) ? 'Termin je već prošao' : ''"
+                (click)="pridruziListi(t.id)">
+          Pridruži se listi
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="filteredTermini.length === 0" class="empty">
+      Nema termina za ovaj dan.
+    </div>
+  </div>
+</div>

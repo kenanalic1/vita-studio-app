@@ -1,0 +1,59 @@
+<div class="modal-overlay" (click)="zatvori.emit()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ terminEdit ? 'Uredi termin' : 'Novi termin' }}</h2>
+      <button class="close-btn" (click)="zatvori.emit()"><lucide-icon name="x" [size]="16" [strokeWidth]="2"></lucide-icon></button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="save()">
+      <div class="form-group">
+        <label class="form-label">Datum i vreme</label>
+        <input type="datetime-local" formControlName="datumVreme" class="form-input">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Trajanje (min)</label>
+          <input type="number" formControlName="trajanje" class="form-input">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Max kapacitet</label>
+          <input type="number" formControlName="maxKapacitet" class="form-input">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Aktivnost</label>
+        <select formControlName="aktivnostId" class="form-input">
+          <option value="">-- Odaberi aktivnost --</option>
+          <option *ngFor="let a of aktivnosti" [value]="a.id">{{ a.naziv }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Trener</label>
+        <select formControlName="trenerId" class="form-input">
+          <option value="">-- Odaberi trenera --</option>
+          <option *ngFor="let t of treneri" [value]="t.id">{{ t.ime }} {{ t.prezime }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Sala</label>
+        <select formControlName="salaId" class="form-input">
+          <option value="">-- Odaberi salu --</option>
+          <option *ngFor="let s of sale" [value]="s.id">{{ s.naziv }} ({{ s.kapacitet }})</option>
+        </select>
+      </div>
+
+      <div class="error-box" *ngIf="errorMsg">{{ errorMsg }}</div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-outline" (click)="zatvori.emit()">Otkaži</button>
+        <button type="submit" class="btn-primary" [disabled]="form.invalid || saving">
+          {{ saving ? 'Čuva se...' : (terminEdit ? 'Sačuvaj izmjene' : 'Sačuvaj termin') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

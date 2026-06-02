@@ -1,0 +1,127 @@
+:host { display: flex; flex-direction: column; flex: 1; overflow: hidden; min-height: 0; }
+
+.page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 28px; border-bottom: 1px solid #e5e7eb; background: #fff;
+  .page-date  { font-size: 11px; color: #6b7280; margin-bottom: 2px; }
+  .page-title { font-size: 22px; font-weight: 700; }
+}
+
+.page-body { flex: 1; overflow-y: auto; padding: 24px 28px; }
+
+.search-input {
+  padding: 8px 12px; width: 260px;
+  border: 1.5px solid #e5e7eb; border-radius: 8px;
+  font-size: 13px; outline: none;
+  &:focus { border-color: #7c3aed; }
+}
+
+.checkin-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr 220px;
+  gap: 16px; height: calc(100vh - 140px);
+}
+
+.col-title {
+  font-size: 13px; font-weight: 700; color: #374151;
+  margin-bottom: 12px;
+}
+
+.termini-col {
+  background: #fff; border: 1px solid #e5e7eb;
+  border-radius: 12px; padding: 16px;
+  overflow-y: auto;
+}
+
+.termin-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px; border-radius: 8px; cursor: pointer;
+  margin-bottom: 4px; transition: background .15s;
+  &:hover { background: #f5f0ff; }
+  &.active { background: #f5f0ff; border: 1.5px solid #c4b5fd; }
+}
+
+.termin-vreme { font-size: 14px; font-weight: 800; min-width: 44px; }
+.termin-info  { flex: 1; }
+.termin-naziv { font-size: 12px; font-weight: 600; }
+.termin-fill  { font-size: 11px; color: #9ca3af; }
+
+.lista-col {
+  background: #fff; border: 1px solid #e5e7eb;
+  border-radius: 12px; padding: 20px;
+  overflow-y: auto;
+}
+
+.lista-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 16px; padding-bottom: 16px;
+  border-bottom: 1px solid #e5e7eb;
+  .lista-naziv { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+}
+
+.prijavljeno-badge {
+  background: #f5f0ff; color: #7c3aed;
+  padding: 4px 12px; border-radius: 999px;
+  font-size: 12px; font-weight: 600; white-space: nowrap;
+}
+
+.checkin-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px; border-radius: 8px; margin-bottom: 6px;
+  border: 1px solid #e5e7eb; transition: background .15s;
+  &.stigao { background: #f0fdf4; border-color: #bbf7d0; }
+}
+
+.ci-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: #7c3aed; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 13px; flex-shrink: 0;
+  &.stigao { background: #16a34a; }
+}
+
+.ci-info  { flex: 1; }
+.ci-ime   { font-size: 13px; font-weight: 600; }
+
+.check-btn {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 2px solid #e5e7eb; background: transparent;
+  cursor: pointer; font-size: 14px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s;
+  &.checked { background: #16a34a; border-color: #16a34a; color: #fff; }
+  &:not(.checked):hover { border-color: #7c3aed; }
+  &:disabled { cursor: default; }
+}
+
+.stats-col { display: flex; flex-direction: column; gap: 10px; }
+
+.stat-card {
+  background: #fff; border: 1px solid #e5e7eb;
+  border-radius: 10px; padding: 14px;
+  &.green  { background: #f0fdf4; border-color: #bbf7d0; }
+  &.purple { background: #f5f0ff; border-color: #c4b5fd; }
+  .stat-num { font-size: 24px; font-weight: 800; }
+  .stat-lbl { font-size: 11px; color: #6b7280; }
+}
+
+.progress-card {
+  background: #fff; border: 1px solid #e5e7eb;
+  border-radius: 10px; padding: 14px;
+}
+
+.progress-bar {
+  height: 8px; border-radius: 99px; background: #e5e7eb; margin-bottom: 6px;
+  .fill { height: 100%; border-radius: 99px; background: #7c3aed; }
+}
+
+.progress-label { font-size: 11px; color: #6b7280; }
+
+.tag {
+  display: inline-block; padding: 2px 8px;
+  border-radius: 999px; font-size: 11px; font-weight: 600;
+  &.tag-green { background: #dcfce7; color: #15803d; }
+}
+
+.text-muted { font-size: 11px; color: #9ca3af; }
+.loading, .empty { padding: 20px; text-align: center; color: #9ca3af; font-size: 13px; }

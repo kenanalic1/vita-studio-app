@@ -1,0 +1,56 @@
+<div class="page-header">
+  <div class="page-title-group">
+    <div class="page-date">i ljudi</div>
+    <div class="page-title">Treneri</div>
+  </div>
+  <div class="header-actions">
+    <input class="search-input" placeholder="Pretraga..." [(ngModel)]="searchTerm">
+    <button class="btn-primary" (click)="showNoviTrener = true">+ Dodaj trenera</button>
+  </div>
+</div>
+
+<div class="page-body">
+  <div *ngIf="loading" class="loading">Učitava se...</div>
+
+  <div class="treneri-grid" *ngIf="!loading">
+    <div *ngFor="let t of filtered" class="trener-card">
+      <div class="trener-header">
+        <div class="avatar">{{ getInitials(t.ime, t.prezime) }}</div>
+        <div class="trener-info">
+          <div class="trener-ime">{{ t.ime }} {{ t.prezime }}</div>
+          <div class="trener-spec">{{ t.specijalizacija }}</div>
+        </div>
+        <button class="btn-icon-sm" (click)="openEdit(t)" title="Uredi"><lucide-icon name="pencil" [size]="14" [strokeWidth]="2"></lucide-icon></button>
+        <button class="btn-icon-sm danger" (click)="deleteTrener(t)" title="Obriši"><lucide-icon name="trash-2" [size]="14" [strokeWidth]="2"></lucide-icon></button>
+      </div>
+
+      <div class="trener-kontakt">
+        <div class="kontakt-row"><lucide-icon name="mail" [size]="13" [strokeWidth]="2"></lucide-icon> {{ t.email }}</div>
+        <div class="kontakt-row"><lucide-icon name="phone" [size]="13" [strokeWidth]="2"></lucide-icon> {{ t.telefon }}</div>
+      </div>
+
+      <div class="spec-tags">
+        <span class="tag tag-purple" *ngFor="let s of getSpecijalizacije(t.specijalizacija)">
+          {{ s }}
+        </span>
+      </div>
+
+      <div class="trener-footer">
+        <button class="btn-outline-sm" routerLink="/admin/kalendar">Raspored</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-novi-trener-modal
+  *ngIf="showNoviTrener"
+  (zatvori)="showNoviTrener = false"
+  (sacuvano)="onTrenerSacuvan()">
+</app-novi-trener-modal>
+
+<app-novi-trener-modal
+  *ngIf="showEditTrener"
+  [trenerEdit]="editTrener"
+  (zatvori)="showEditTrener = false; editTrener = null"
+  (sacuvano)="onTrenerSacuvan()">
+</app-novi-trener-modal>

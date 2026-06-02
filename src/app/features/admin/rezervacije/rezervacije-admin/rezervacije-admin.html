@@ -1,0 +1,90 @@
+<div class="page-header">
+  <div class="page-title-group">
+    <div class="page-date">Administracija</div>
+    <div class="page-title">Rezervacije</div>
+  </div>
+  <input class="search-input" placeholder="Pretraga po imenu, aktivnosti, treneru..."
+         [(ngModel)]="searchTerm" (ngModelChange)="onSearch()">
+</div>
+
+<div class="page-body">
+
+  <div class="stats-row" *ngIf="!loading">
+    <div class="stat-chip">
+      <span class="stat-num">{{ counts.sve }}</span>
+      <span class="stat-lbl">Ukupno</span>
+    </div>
+    <div class="stat-chip green">
+      <span class="stat-num">{{ counts.aktivne }}</span>
+      <span class="stat-lbl">Aktivnih</span>
+    </div>
+    <div class="stat-chip red">
+      <span class="stat-num">{{ counts.otkazane }}</span>
+      <span class="stat-lbl">Otkazanih</span>
+    </div>
+    <div class="stat-chip blue">
+      <span class="stat-num">{{ counts.zavrsene }}</span>
+      <span class="stat-lbl">Završenih</span>
+    </div>
+  </div>
+
+  <div class="filter-bar">
+    <div class="status-tabs">
+      <button [class.active]="statusFilter === 'sve'"      (click)="setStatus('sve')">Sve</button>
+      <button [class.active]="statusFilter === 'aktivna'"  (click)="setStatus('aktivna')">Aktivne</button>
+      <button [class.active]="statusFilter === 'otkazana'" (click)="setStatus('otkazana')">Otkazane</button>
+      <button [class.active]="statusFilter === 'zavrsena'" (click)="setStatus('zavrsena')">Završene</button>
+    </div>
+    <div class="date-filter">
+      <input type="date" class="date-input"
+             [(ngModel)]="datumFilter" (ngModelChange)="onDatumChange()">
+      <button class="btn-clear" *ngIf="datumFilter" (click)="resetDatum()"><lucide-icon name="x" [size]="14" [strokeWidth]="2"></lucide-icon></button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading">Učitava se...</div>
+
+  <div class="card table-card" *ngIf="!loading">
+    <table class="vs-table">
+      <thead>
+        <tr>
+          <th>Članica</th>
+          <th>Aktivnost</th>
+          <th>Datum termina</th>
+          <th>Trener</th>
+          <th>Sala</th>
+          <th>Datum rezervacije</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let r of filtered">
+          <td><strong>{{ r.clanImePrezime }}</strong></td>
+          <td>{{ r.aktivnostNaziv }}</td>
+          <td>{{ r.terminDatumVreme | date:'dd.MM.yyyy · HH:mm' }}</td>
+          <td class="text-muted">{{ r.trenerImePrezime }}</td>
+          <td class="text-muted">{{ r.salaNaziv }}</td>
+          <td class="text-muted">{{ r.datumRezervacije | date:'dd.MM.yyyy' }}</td>
+          <td>
+            <span class="tag" [ngClass]="getStatusClass(r.status)">
+              {{ getStatusLabel(r.status) }}
+            </span>
+          </td>
+          <td>
+            <button class="btn-otkazi"
+                    *ngIf="r.status === 'aktivna'"
+                    [disabled]="otkazujeId === r.id"
+                    (click)="otkazi(r.id)">
+              Otkaži
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div *ngIf="filtered.length === 0" class="empty">
+      {{ searchTerm ? 'Nema rezultata za "' + searchTerm + '".' : 'Nema rezervacija za odabrane filtere.' }}
+    </div>
+  </div>
+
+</div>

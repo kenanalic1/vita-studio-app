@@ -1,0 +1,34 @@
+<div class="bell-wrap">
+  <button class="bell-btn" (click)="toggle()">
+    <lucide-icon name="bell" [size]="18" [strokeWidth]="2"></lucide-icon>
+    <span class="notif-badge" *ngIf="broj > 0">{{ broj > 9 ? '9+' : broj }}</span>
+  </button>
+
+  <div class="dropdown" *ngIf="open">
+    <div class="dropdown-header">
+      <span class="dropdown-title">Obaveštenja</span>
+    </div>
+
+    <div class="dropdown-body">
+      <div *ngIf="notifikacije.length === 0" class="empty">
+        Nema obaveštenja.
+      </div>
+
+      <div *ngFor="let n of notifikacije"
+           class="notif-item"
+           [class.neprocitana]="!n.procitana"
+           [class.tip-uspeh]="n.tip === 'uspeh'"
+           [class.tip-upozorenje]="n.tip === 'upozorenje'">
+        <div class="notif-icon">
+          <lucide-icon *ngIf="n.tip === 'uspeh'" name="check" [size]="14" [strokeWidth]="2.5"></lucide-icon>
+          <lucide-icon *ngIf="n.tip === 'upozorenje'" name="alert-triangle" [size]="14" [strokeWidth]="2"></lucide-icon>
+          <lucide-icon *ngIf="n.tip !== 'uspeh' && n.tip !== 'upozorenje'" name="bell" [size]="14" [strokeWidth]="2"></lucide-icon>
+        </div>
+        <div class="notif-body">
+          <div class="notif-tekst">{{ n.tekst }}</div>
+          <div class="notif-vreme">{{ timeAgo(n.datumKreiranja) }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

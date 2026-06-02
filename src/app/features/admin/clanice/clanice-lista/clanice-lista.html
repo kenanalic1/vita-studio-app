@@ -1,0 +1,144 @@
+<div class="page-header">
+  <div class="page-title-group">
+    <div class="page-date">i ljudi</div>
+    <div class="page-title">Članice</div>
+  </div>
+  <div class="header-actions">
+    <input class="search-input" placeholder="Pretraga po imenu, emailu..."
+           [(ngModel)]="searchTerm" (ngModelChange)="onSearch()">
+<button class="btn-primary" (click)="showNovaClanica = true">+ Nova članica</button>  </div>
+</div>
+
+<div class="page-body">
+  <div class="filter-bar">
+    <button class="filter-btn" [class.active]="filter==='sve'" (click)="setFilter('sve')">
+      Sve · {{ counts.sve }}
+    </button>
+    <button class="filter-btn" [class.active]="filter==='aktivna'" (click)="setFilter('aktivna')">
+      Aktivne · {{ counts.aktivne }}
+    </button>
+    <button class="filter-btn" [class.active]="filter==='istice'" (click)="setFilter('istice')">
+      Ističe ≤7d · {{ counts.istice }}
+    </button>
+    <button class="filter-btn" [class.active]="filter==='istekla'" (click)="setFilter('istekla')">
+      Istekle · {{ counts.istekle }}
+    </button>
+    <button class="filter-btn filter-btn-pending" [class.active]="filter==='cekanje'" (click)="setFilter('cekanje')">
+      Na čekanju
+      <span class="pending-badge" *ngIf="counts.cekanje > 0">{{ counts.cekanje }}</span>
+    </button>
+  </div>
+
+  <!-- Pending approval table -->
+  <div class="card table-card" *ngIf="filter === 'cekanje'">
+    <div class="pending-info-bar">
+      Ovi korisnici su se registrovali i čekaju odobrenje. Odobri ih kako bi mogli da se prijave.
+    </div>
+    <table class="vs-table" *ngIf="filteredPending.length > 0">
+      <thead>
+        <tr>
+          <th>Korisnik</th>
+          <th>Kontakt</th>
+          <th>Datum registracije</th>
+          <th>Akcije</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let c of filteredPending">
+          <td>
+            <div class="clan-cell">
+              <div class="avatar avatar-pending">{{ c.ime[0] }}{{ c.prezime[0] }}</div>
+              <div>
+                <div class="clan-name">{{ c.ime }} {{ c.prezime }}</div>
+                <div class="clan-since">{{ c.datumRodjenja | date:'dd.MM.yyyy' }}</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div>{{ c.email }}</div>
+            <div class="text-muted">{{ c.telefon }}</div>
+          </td>
+          <td>{{ c.datumKreiranja | date:'dd.MM.yyyy HH:mm' }}</td>
+          <td>
+            <div class="action-btns">
+              <button class="btn-odobri" (click)="odobri(c.id, $event)"
+                      [disabled]="actionLoading.has(c.id)">
+                <ng-container *ngIf="!actionLoading.has(c.id)"><lucide-icon name="check" [size]="14" [strokeWidth]="2.5"></lucide-icon> Odobri</ng-container>
+                <ng-container *ngIf="actionLoading.has(c.id)">...</ng-container>
+              </button>
+              <button class="btn-odbij" (click)="odbij(c.id, $event)"
+                      [disabled]="actionLoading.has(c.id)">
+                <lucide-icon name="x" [size]="14" [strokeWidth]="2"></lucide-icon> Odbij
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div *ngIf="filteredPending.length === 0" class="empty">
+      Nema naloga na čekanju.
+    </div>
+  </div>
+
+  <!-- Normal members table -->
+  <div class="card table-card" *ngIf="filter !== 'cekanje'">
+    <div *ngIf="loading" class="loading">Učitava se...</div>
+
+    <table class="vs-table" *ngIf="!loading">
+      <thead>
+        <tr>
+          <th>Članica</th>
+          <th>Kontakt</th>
+          <th>Paket</th>
+          <th>Status</th>
+          <th>Ističe</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let c of filteredClanice"
+            (click)="openProfil(c.id)" class="clickable">
+          <td>
+            <div class="clan-cell">
+              <div class="avatar">{{ c.ime[0] }}{{ c.prezime[0] }}</div>
+              <div>
+                <div class="clan-name">{{ c.ime }} {{ c.prezime }}</div>
+                <div class="clan-since">Članica od {{ c.datumKreiranja | date:'dd.MM.yyyy' }}</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div>{{ c.email }}</div>
+            <div class="text-muted">{{ c.telefon }}</div>
+          </td>
+          <td>
+            <div>{{ getClanarina(c.id)?.nazivPaketa || '—' }}</div>
+            <div class="text-muted">{{ getClanarina(c.id)?.cena | number:'1.0-0' }} RSD</div>
+          </td>
+          <td>
+            <span class="tag" [ngClass]="getStatusClass(c.id)">
+              {{ getStatusLabel(c.id) }}
+            </span>
+          </td>
+          <td>
+            <div>{{ getClanarina(c.id)?.datumIsteka | date:'dd.MM.yyyy' }}</div>
+            <div class="text-muted">{{ getDaysLeft(c.id) }}</div>
+          </td>
+          <td (click)="$event.stopPropagation()">
+            <button class="btn-dots">···</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="!loading && filteredClanice.length === 0" class="empty">
+      Nema članica po ovom filteru.
+    </div>
+  </div>
+</div>
+
+<app-nova-clanica-modal
+  *ngIf="showNovaClanica"
+  (zatvori)="showNovaClanica = false"
+  (sacuvano)="onClanicaSacuvana()">
+</app-nova-clanica-modal>

@@ -1,0 +1,156 @@
+<div class="page-header">
+  <div class="page-title-group">
+    <div class="page-date">Profil</div>
+    <div class="page-title">Moj profil</div>
+  </div>
+  <button class="btn-primary" (click)="editMode = !editMode; lozinkaSuccess = false">
+    <ng-container *ngIf="editMode"><lucide-icon name="x" [size]="14" [strokeWidth]="2"></lucide-icon> Otkaži</ng-container>
+    <ng-container *ngIf="!editMode"><lucide-icon name="pencil" [size]="14" [strokeWidth]="2"></lucide-icon> Uredi</ng-container>
+  </button>
+</div>
+
+<div class="page-body" *ngIf="!loading && profil">
+  <div class="profil-grid">
+
+    <!-- Lijeva kolona — lični podaci -->
+    <div class="left-col">
+      <div class="card profil-card">
+        <div class="avatar-wrap">
+          <div class="avatar-xl">{{ initials }}</div>
+          <div>
+            <div class="profil-ime">{{ profil!.ime }} {{ profil!.prezime }}</div>
+            <div class="profil-meta">Članica od {{ profil!.datumKreiranja | date:'MMM yyyy.' }}</div>
+            <span class="tag tag-green">● aktivna</span>
+          </div>
+        </div>
+
+        <!-- Prikaz podataka -->
+        <div *ngIf="!editMode" class="info-lista">
+          <div class="info-row">
+            <span class="info-icon"><lucide-icon name="mail" [size]="14" [strokeWidth]="2"></lucide-icon></span>
+            <div>
+              <div class="info-label">Email</div>
+              <div class="info-val">{{ profil!.email }}</div>
+            </div>
+          </div>
+          <div class="info-row">
+            <span class="info-icon"><lucide-icon name="phone" [size]="14" [strokeWidth]="2"></lucide-icon></span>
+            <div>
+              <div class="info-label">Telefon</div>
+              <div class="info-val">{{ profil!.telefon }}</div>
+            </div>
+          </div>
+          <div class="info-row">
+            <span class="info-icon"><lucide-icon name="cake" [size]="14" [strokeWidth]="2"></lucide-icon></span>
+            <div>
+              <div class="info-label">Datum rođenja</div>
+              <div class="info-val">{{ profil!.datumRodjenja | date:'dd.MM.yyyy' }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Forma za uređivanje -->
+        <form *ngIf="editMode" [formGroup]="form" (ngSubmit)="save()" class="edit-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Ime</label>
+              <input type="text" formControlName="ime" class="form-input">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Prezime</label>
+              <input type="text" formControlName="prezime" class="form-input">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" formControlName="email" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Telefon</label>
+            <input type="text" formControlName="telefon" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Datum rođenja</label>
+            <input type="date" formControlName="datumRodjenja" class="form-input">
+          </div>
+          <button type="submit" class="btn-primary w-full" [disabled]="saving || form.invalid">
+            {{ saving ? 'Čuva se...' : 'Sačuvaj izmjene' }}
+          </button>
+        </form>
+      </div>
+
+      <!-- Promjena lozinke -->
+      <div class="card">
+        <div class="lozinka-header" (click)="showLozinka = !showLozinka; lozinkaError = ''; lozinkaSuccess = false">
+          <div class="card-title" style="margin:0"><lucide-icon name="lock" [size]="14" [strokeWidth]="2"></lucide-icon> Promjena lozinke</div>
+          <span class="toggle-icon">
+            <lucide-icon *ngIf="showLozinka" name="chevron-up" [size]="14" [strokeWidth]="2"></lucide-icon>
+            <lucide-icon *ngIf="!showLozinka" name="chevron-down" [size]="14" [strokeWidth]="2"></lucide-icon>
+          </span>
+        </div>
+
+        <form *ngIf="showLozinka" [formGroup]="lozinkaForm" (ngSubmit)="promijeniLozinku()" class="edit-form" style="margin-top:16px">
+          <div class="form-group">
+            <label class="form-label">Trenutna lozinka</label>
+            <input type="password" formControlName="staraLozinka" class="form-input" placeholder="••••••••">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nova lozinka</label>
+            <input type="password" formControlName="novaLozinka" class="form-input" placeholder="min. 6 karaktera">
+          </div>
+          <div class="alert-error" *ngIf="lozinkaError">{{ lozinkaError }}</div>
+          <div class="alert-success" *ngIf="lozinkaSuccess"><lucide-icon name="check" [size]="14" [strokeWidth]="2.5"></lucide-icon> Lozinka uspješno promijenjena.</div>
+          <button type="submit" class="btn-primary w-full"
+                  [disabled]="savingLozinka || lozinkaForm.invalid">
+            {{ savingLozinka ? 'Mijenja se...' : 'Promijeni lozinku' }}
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Desna kolona — statistika i aktivnosti -->
+    <div class="right-col">
+      <div class="card">
+        <div class="card-title">Statistika</div>
+        <div class="stat-row">
+          <span class="text-muted">Dolasci 30d</span>
+          <strong>{{ profil!.dolasci30d }}</strong>
+        </div>
+        <div class="stat-row">
+          <span class="text-muted">Ukupno termina</span>
+          <strong>{{ profil!.ukupnoTermina }}</strong>
+        </div>
+        <div class="stat-row">
+          <span class="text-muted">Otkazivanja</span>
+          <strong>{{ profil!.otkazivanja }}</strong>
+        </div>
+        <div class="stat-row">
+          <span class="text-muted">Na listi čekanja</span>
+          <strong>{{ profil!.naListiCekanja }}</strong>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Posljednje aktivnosti</div>
+        <ng-container *ngIf="profil!.istorijaDolazaka.length > 0; else noAktivnosti">
+          <div class="aktivnost-row" *ngFor="let e of profil!.istorijaDolazaka">
+            <div>
+              <div class="aktivnost-naziv">{{ e.aktivnostNaziv }}</div>
+              <div class="text-muted">{{ e.trenerImePrezime }}</div>
+            </div>
+            <div class="text-right">
+              <div class="aktivnost-datum">{{ e.datumDolaska | date:'dd.MM.yyyy' }}</div>
+              <span class="tag tag-blue">● stigla</span>
+            </div>
+          </div>
+        </ng-container>
+        <ng-template #noAktivnosti>
+          <div class="empty">Nema evidentiranih dolazaka.</div>
+        </ng-template>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div *ngIf="loading" class="loading">Učitava se...</div>

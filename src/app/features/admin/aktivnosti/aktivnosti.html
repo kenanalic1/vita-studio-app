@@ -1,0 +1,64 @@
+<div class="page-header">
+  <div class="page-title-group">
+    <div class="page-date">Ponuda</div>
+    <div class="page-title">Aktivnosti</div>
+  </div>
+<button class="btn-primary" (click)="showNovaAktivnost = true">+ Nova aktivnost</button></div>
+
+<div class="page-body">
+  <div *ngIf="loading" class="loading">Učitava se...</div>
+  <div class="card table-card" *ngIf="!loading">
+    <table class="vs-table">
+      <thead>
+        <tr>
+          <th>Aktivnost</th>
+          <th>Tip</th>
+          <th>Treneri</th>
+          <th>Popunjenost</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let a of aktivnosti">
+          <td>
+            <div class="aktivnost-naziv">{{ a.naziv }}</div>
+            <div class="text-muted">{{ a.opis }}</div>
+          </td>
+          <td>
+            <span class="tag" [ngClass]="getTipClass(a.tipAktivnosti)">
+              {{ a.tipAktivnosti }}
+            </span>
+          </td>
+          <td>
+            <div *ngIf="a.treneri?.length; else nemaT" class="text-muted" style="font-size:12px;">
+              {{ a.treneri.join(', ') }}
+            </div>
+            <ng-template #nemaT><span class="text-muted">—</span></ng-template>
+          </td>
+          <td>
+            <div class="progress-bar">
+              <div class="fill" [style.width.%]="a.popunjenost"></div>
+            </div>
+            <div style="font-size:11px;color:#6b7280;margin-top:2px;">{{ a.popunjenost }}%</div>
+          </td>
+          <td>
+            <button class="btn-icon-sm" (click)="openEdit(a)"><lucide-icon name="pencil" [size]="14" [strokeWidth]="2"></lucide-icon></button>
+            <button class="btn-icon-sm danger" (click)="deleteAktivnost(a)"><lucide-icon name="trash-2" [size]="14" [strokeWidth]="2"></lucide-icon></button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<app-nova-aktivnost-modal
+  *ngIf="showNovaAktivnost"
+  (zatvori)="showNovaAktivnost = false"
+  (sacuvano)="onAktivnostSacuvana()">
+</app-nova-aktivnost-modal>
+
+<app-nova-aktivnost-modal
+  *ngIf="showEditAktivnost"
+  [aktivnostEdit]="editAktivnost"
+  (zatvori)="showEditAktivnost = false; editAktivnost = null"
+  (sacuvano)="onAktivnostSacuvana()">
+</app-nova-aktivnost-modal>

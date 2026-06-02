@@ -1,0 +1,101 @@
+<div class="login-shell">
+
+  <div class="login-left">
+    <div class="login-logo">
+      <div class="logo-icon">V</div>
+      <span class="logo-name">Vita Studio</span>
+    </div>
+    <div class="login-hero">
+      <h1>Pridruži se našoj <em>zajednici.</em></h1>
+      <p>Registruj se i dobij pristup svim terminima, treninzima i praćenju napretka — sve na jednom mestu.</p>
+    </div>
+    <footer class="login-footer">© 2026 Vita Studio · Novi Pazar</footer>
+  </div>
+
+  <div class="login-right">
+    <div class="login-form-wrap">
+
+      <!-- Success ekran -->
+      <ng-container *ngIf="success">
+        <div class="success-wrap">
+          <div class="success-icon"><lucide-icon name="check" [size]="32" [strokeWidth]="2.5"></lucide-icon></div>
+          <h2>Nalog kreiran!</h2>
+          <p class="form-sub">
+            Tvoj nalog čeka odobrenje od strane administratora.<br>
+            Kada bude odobren, moći ćeš da se prijaviš.
+          </p>
+          <a routerLink="/login" class="login-btn" style="display:block;text-align:center;text-decoration:none;line-height:48px;">
+            Idi na prijavu
+          </a>
+        </div>
+      </ng-container>
+
+      <!-- Forma -->
+      <ng-container *ngIf="!success">
+      <p class="form-super">NOVI NALOG</p>
+      <h2>Registracija</h2>
+      <p class="form-sub">Popuni podatke da kreiraš nalog.</p>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Ime</label>
+            <input type="text" formControlName="ime" class="form-input" placeholder="Ana">
+            <span class="field-error" *ngIf="err('ime')">Obavezno polje.</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Prezime</label>
+            <input type="text" formControlName="prezime" class="form-input" placeholder="Marković">
+            <span class="field-error" *ngIf="err('prezime')">Obavezno polje.</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Email adresa</label>
+          <input type="email" formControlName="email" class="form-input" placeholder="ana@example.com">
+          <span class="field-error" *ngIf="err('email')">Unesite validan email.</span>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Telefon</label>
+            <input type="text" formControlName="telefon" class="form-input" placeholder="+381 60 123 4567">
+            <span class="field-error" *ngIf="err('telefon')">Obavezno polje.</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Datum rođenja</label>
+            <input type="date" formControlName="datumRodjenja" class="form-input">
+            <span class="field-error" *ngIf="err('datumRodjenja')">Obavezno polje.</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Lozinka</label>
+            <input type="password" formControlName="lozinka" class="form-input" placeholder="min. 6 karaktera">
+            <span class="field-error" *ngIf="err('lozinka')">Min. 6 karaktera.</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Potvrda lozinke</label>
+            <input type="password" formControlName="potvrdaLozinke" class="form-input" placeholder="••••••••">
+            <span class="field-error" *ngIf="mismatch">Lozinke se ne podudaraju.</span>
+          </div>
+        </div>
+
+        <div class="error-box" *ngIf="errorMsg">{{ errorMsg }}</div>
+
+        <button type="submit" class="login-btn" [disabled]="form.invalid || loading">
+          <span *ngIf="!loading">Kreiraj nalog →</span>
+          <span *ngIf="loading">Registracija...</span>
+        </button>
+      </form>
+
+      <p class="contact-line">
+        Već imaš nalog? <a routerLink="/login">Prijavi se</a>
+      </p>
+      </ng-container>
+
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,40 @@
+<div class="modal-overlay" (click)="zatvori.emit()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ aktivnostEdit ? 'Uredi aktivnost' : 'Nova aktivnost' }}</h2>
+      <button class="close-btn" (click)="zatvori.emit()"><lucide-icon name="x" [size]="16" [strokeWidth]="2"></lucide-icon></button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="save()">
+      <div class="form-group">
+        <label class="form-label">Naziv aktivnosti</label>
+        <input type="text" formControlName="naziv" class="form-input"
+               placeholder="npr. Vinyasa Flow">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Opis</label>
+        <textarea formControlName="opis" class="form-input"
+                  rows="3" placeholder="Kratki opis aktivnosti..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Tip aktivnosti</label>
+        <select formControlName="tipAktivnosti" class="form-input">
+          <option value="grupni">Grupni</option>
+          <option value="teretana">Teretana</option>
+          <option value="teren">Teren</option>
+        </select>
+      </div>
+
+      <div class="error-box" *ngIf="errorMsg">{{ errorMsg }}</div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-outline" (click)="zatvori.emit()">Otkaži</button>
+        <button type="submit" class="btn-primary" [disabled]="form.invalid || saving">
+          {{ saving ? 'Čuva se...' : (aktivnostEdit ? 'Sačuvaj izmjene' : 'Dodaj aktivnost') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

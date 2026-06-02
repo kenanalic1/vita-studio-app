@@ -1,0 +1,86 @@
+<div class="page-header">
+  <div class="page-title-group">
+    <div class="page-date">Administracija</div>
+    <div class="page-title">Lista čekanja</div>
+  </div>
+  <input class="search-input" placeholder="Pretraga po imenu, aktivnosti..."
+         [(ngModel)]="searchTerm" (ngModelChange)="onSearch()">
+</div>
+
+<div class="page-body">
+
+  <div class="top-bar">
+    <div class="stats-row" *ngIf="!loading">
+      <div class="stat-chip">
+        <span class="stat-num">{{ ukupno }}</span>
+        <span class="stat-lbl">Osoba na listi</span>
+      </div>
+      <div class="stat-chip purple">
+        <span class="stat-num">{{ ukupnoTermina }}</span>
+        <span class="stat-lbl">Termina s listom</span>
+      </div>
+    </div>
+    <div class="date-filter">
+      <input type="date" class="date-input"
+             [(ngModel)]="datumFilter" (ngModelChange)="onDatumChange()">
+      <button class="btn-clear" *ngIf="datumFilter" (click)="resetDatum()"><lucide-icon name="x" [size]="14" [strokeWidth]="2"></lucide-icon></button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading">Učitava se...</div>
+
+  <ng-container *ngIf="!loading">
+    <ng-container *ngIf="grupePoTerminu.length > 0; else prazno">
+      <div class="termin-group" *ngFor="let g of grupePoTerminu">
+
+        <div class="group-header">
+          <div class="group-info">
+            <div class="group-naziv">{{ g.naziv }}</div>
+            <div class="group-meta">
+              {{ g.datumVreme | date:'EEEE, d. MMMM yyyy. · HH:mm' }} ·
+              {{ g.sala }} · {{ g.trener }}
+            </div>
+          </div>
+          <span class="group-badge">{{ g.stavke.length }} na listi</span>
+        </div>
+
+        <div class="stavke-table">
+          <table class="vs-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Članica</th>
+                <th>Prijavljena</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let s of g.stavke">
+                <td>
+                  <span class="pozicija-badge">{{ s.pozicija }}</span>
+                </td>
+                <td><strong>{{ s.clanImePrezime }}</strong></td>
+                <td class="text-muted">{{ s.datumPrijave | date:'dd.MM.yyyy · HH:mm' }}</td>
+                <td>
+                  <button class="btn-ukloni"
+                          [disabled]="uklanjajuciId === s.id"
+                          (click)="ukloni(s.id, s.clanImePrezime)">
+                    Ukloni
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </ng-container>
+
+    <ng-template #prazno>
+      <div class="empty">
+        {{ datumFilter ? 'Nema lista čekanja za odabrani datum.' : 'Trenutno nema aktivnih lista čekanja.' }}
+      </div>
+    </ng-template>
+  </ng-container>
+
+</div>
