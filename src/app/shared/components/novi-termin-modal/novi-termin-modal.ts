@@ -79,7 +79,7 @@ export class NoviTerminModal implements OnInit {
 
     const val = this.form.value;
     const dto = {
-      datumVreme: new Date(val.datumVreme).toISOString(),
+      datumVreme: val.datumVreme,
       trajanje: +val.trajanje,
       maxKapacitet: +val.maxKapacitet,
       aktivnostId: +val.aktivnostId,
