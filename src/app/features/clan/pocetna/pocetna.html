@@ -100,12 +100,24 @@
             <div class="pred-naziv">{{ t.aktivnostNaziv }}</div>
             <div class="text-muted">{{ t.trenerImePrezime }}</div>
             <div class="pred-footer">
-              <span class="text-muted">{{ t.brojRezervacija }} mesta od {{ t.maxKapacitet }}</span>
+              <span class="text-muted">
+                {{ t.brojRezervacija >= t.maxKapacitet
+                    ? 'Popunjeno · +' + t.brojNaListiCekanja
+                    : (t.maxKapacitet - t.brojRezervacija) + ' mesta od ' + t.maxKapacitet }}
+              </span>
               <button class="btn-primary btn-sm"
+                      *ngIf="t.brojRezervacija < t.maxKapacitet"
                       [disabled]="!imAktivnuClanarinu || isPast(t.datumVreme) || rezervisaniIds.has(t.id)"
                       [title]="isPast(t.datumVreme) ? 'Termin je već prošao' : ''"
                       (click)="rezervisi(t.id)">
                 {{ rezervisaniIds.has(t.id) ? 'Rezervisan' : 'Rezerviši' }}
+              </button>
+              <button class="btn-outline-sm"
+                      *ngIf="t.brojRezervacija >= t.maxKapacitet"
+                      [disabled]="!imAktivnuClanarinu || isPast(t.datumVreme)"
+                      [title]="isPast(t.datumVreme) ? 'Termin je već prošao' : ''"
+                      (click)="pridruziListi(t.id)">
+                Lista čekanja
               </button>
             </div>
           </div>

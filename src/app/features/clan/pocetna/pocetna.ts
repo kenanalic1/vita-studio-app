@@ -111,6 +111,13 @@ export class Pocetna implements OnInit {
     });
   }
 
+  pridruziListi(terminId: number) {
+    this.rezSvc.pridruziListi(terminId).subscribe({
+      next: () => this.ngOnInit(),
+      error: (e) => alert(e.error?.message ?? 'Greška pri prijavi na listu čekanja.'),
+    });
+  }
+
   otkazi(id: number) {
     this.rezSvc.otkazi(id).subscribe({
       next: () => this.ngOnInit(),
