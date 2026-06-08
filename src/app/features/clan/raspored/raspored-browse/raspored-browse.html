@@ -85,14 +85,19 @@
       <div class="termin-footer">
         <span class="slot-text">{{ getSlotLabel(t) }}</span>
         <button class="btn-primary btn-sm"
-                *ngIf="t.brojRezervacija < t.maxKapacitet"
-                [disabled]="!imAktivnuClanarinu || isPast(t.datumVreme) || rezervisaniIds.has(t.id)"
+                *ngIf="rezervisaniIds.has(t.id)"
+                [disabled]="true">
+          Rezervisan
+        </button>
+        <button class="btn-primary btn-sm"
+                *ngIf="!rezervisaniIds.has(t.id) && t.brojRezervacija < t.maxKapacitet"
+                [disabled]="!imAktivnuClanarinu || isPast(t.datumVreme)"
                 [title]="isPast(t.datumVreme) ? 'Termin je već prošao' : ''"
                 (click)="rezervisi(t.id)">
-          {{ rezervisaniIds.has(t.id) ? 'Rezervisan' : 'Rezerviši' }}
+          Rezerviši
         </button>
         <button class="btn-outline-sm"
-                *ngIf="t.brojRezervacija >= t.maxKapacitet"
+                *ngIf="!rezervisaniIds.has(t.id) && t.brojRezervacija >= t.maxKapacitet"
                 [disabled]="!imAktivnuClanarinu || isPast(t.datumVreme)"
                 [title]="isPast(t.datumVreme) ? 'Termin je već prošao' : ''"
                 (click)="pridruziListi(t.id)">
