@@ -178,6 +178,14 @@ export class Izvestaji implements OnInit {
     }
 
     const filename = `vita-studio-izvestaj-${this.selectedPeriod}m-${new Date().toISOString().slice(0, 10)}.pdf`;
-    doc.save(filename);
+    const blob = doc.output('blob');
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 }

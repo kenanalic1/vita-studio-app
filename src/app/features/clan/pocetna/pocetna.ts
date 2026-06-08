@@ -20,6 +20,7 @@ export class Pocetna implements OnInit {
   showPredlozenoFilter = false;
   predlozenoFilter = 'Sve';
   predlozenoAktivnosti: string[] = ['Sve'];
+  rezervisaniIds = new Set<number>();
 
   constructor(
     private svc: PregledService,
@@ -101,7 +102,11 @@ export class Pocetna implements OnInit {
 
   rezervisi(terminId: number) {
     this.rezSvc.rezervisi(terminId).subscribe({
-      next: () => this.ngOnInit(),
+      next: () => {
+        this.rezervisaniIds.add(terminId);
+        this.cdr.detectChanges();
+        this.ngOnInit();
+      },
       error: (e) => alert(e.error?.message ?? 'Greška pri rezervaciji.'),
     });
   }

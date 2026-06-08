@@ -1,5 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { environment } from '../../../../../environments/environment';
 import { Trener } from '../../../../core/models/models';
 
@@ -28,7 +29,12 @@ export class TreneriLista implements OnInit {
   constructor(
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
+    private router: Router,
   ) {}
+
+  openRaspored(trenerId: number) {
+    this.router.navigate(['/admin/kalendar'], { queryParams: { trenerId } });
+  }
 
   ngOnInit() {
     this.http.get<Trener[]>(`${environment.apiUrl}/treneri`).subscribe({

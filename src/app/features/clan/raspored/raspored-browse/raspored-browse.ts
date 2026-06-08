@@ -21,6 +21,7 @@ export class RasporedBrowse implements OnInit {
   loading = true;
   currentWeekOffset = 0;
   imAktivnuClanarinu = true;
+  rezervisaniIds = new Set<number>();
 
   isPast(datumVreme: string): boolean {
     return new Date(datumVreme) < new Date();
@@ -133,6 +134,7 @@ export class RasporedBrowse implements OnInit {
   }
 
   getSlotStatus(t: Termin): string {
+    if (this.isPast(t.datumVreme)) return 'proslo';
     if (t.brojRezervacija >= t.maxKapacitet) return 'popunjeno';
     if (t.brojRezervacija / t.maxKapacitet > 0.75) return 'jos-mesta';
     return 'dostupno';
@@ -145,7 +147,11 @@ export class RasporedBrowse implements OnInit {
 
   rezervisi(terminId: number) {
     this.rezSvc.rezervisi(terminId).subscribe({
-      next: () => this.loadTermini(this.selectedDan),
+      next: () => {
+        this.rezervisaniIds.add(terminId);
+        this.cdr.detectChanges();
+        this.loadTermini(this.selectedDan);
+      },
       error: (e) => alert(e.error?.message ?? 'Greška.'),
     });
   }

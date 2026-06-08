@@ -17,8 +17,12 @@
           <input type="number" formControlName="trajanje" class="form-input">
         </div>
         <div class="form-group">
-          <label class="form-label">Max kapacitet</label>
-          <input type="number" formControlName="maxKapacitet" class="form-input">
+          <label class="form-label">
+            Max kapacitet
+            <span *ngIf="kapacitetSale > 0" class="form-hint">(maks. {{ kapacitetSale }})</span>
+          </label>
+          <input type="number" formControlName="maxKapacitet" class="form-input"
+            [max]="kapacitetSale || null" min="1">
         </div>
       </div>
 

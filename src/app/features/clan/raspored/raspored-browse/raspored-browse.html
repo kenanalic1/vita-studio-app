@@ -60,7 +60,8 @@
         <span class="tag tag-naziv">{{ t.aktivnostNaziv }}</span>
         <span class="slot-chip" [ngClass]="getSlotStatus(t)">
           {{ getSlotStatus(t) === 'popunjeno' ? 'Popunjeno' :
-             getSlotStatus(t) === 'jos-mesta' ? 'Još 2 mesta' : 'Dostupno' }}
+             getSlotStatus(t) === 'proslo'    ? 'Nedostupno' :
+             getSlotStatus(t) === 'jos-mesta' ? 'Još mesta'  : 'Dostupno' }}
         </span>
       </div>
 
@@ -85,10 +86,10 @@
         <span class="slot-text">{{ getSlotLabel(t) }}</span>
         <button class="btn-primary btn-sm"
                 *ngIf="t.brojRezervacija < t.maxKapacitet"
-                [disabled]="!imAktivnuClanarinu || isPast(t.datumVreme)"
+                [disabled]="!imAktivnuClanarinu || isPast(t.datumVreme) || rezervisaniIds.has(t.id)"
                 [title]="isPast(t.datumVreme) ? 'Termin je već prošao' : ''"
                 (click)="rezervisi(t.id)">
-          Rezerviši
+          {{ rezervisaniIds.has(t.id) ? 'Rezervisan' : 'Rezerviši' }}
         </button>
         <button class="btn-outline-sm"
                 *ngIf="t.brojRezervacija >= t.maxKapacitet"

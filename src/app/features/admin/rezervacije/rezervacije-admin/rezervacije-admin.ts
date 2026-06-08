@@ -30,10 +30,7 @@ export class RezervacijeAdmin implements OnInit {
   load() {
     this.loading = true;
     let url = `${environment.apiUrl}/rezervacije`;
-    const params: string[] = [];
-    if (this.statusFilter !== 'sve') params.push(`status=${this.statusFilter}`);
-    if (this.datumFilter) params.push(`datum=${this.datumFilter}`);
-    if (params.length) url += '?' + params.join('&');
+    if (this.datumFilter) url += `?datum=${this.datumFilter}`;
 
     this.http.get<Rezervacija[]>(url).subscribe({
       next: (r) => {
@@ -50,20 +47,25 @@ export class RezervacijeAdmin implements OnInit {
   }
 
   applySearch() {
-    if (!this.searchTerm) { this.filtered = this.sve; return; }
-    const q = this.searchTerm.toLowerCase();
-    this.filtered = this.sve.filter(r =>
-      r.clanImePrezime.toLowerCase().includes(q) ||
-      r.aktivnostNaziv.toLowerCase().includes(q) ||
-      r.trenerImePrezime.toLowerCase().includes(q),
-    );
+    let result = this.sve;
+    if (this.statusFilter !== 'sve')
+      result = result.filter(r => r.status === this.statusFilter);
+    if (this.searchTerm) {
+      const q = this.searchTerm.toLowerCase();
+      result = result.filter(r =>
+        r.clanImePrezime.toLowerCase().includes(q) ||
+        r.aktivnostNaziv.toLowerCase().includes(q) ||
+        r.trenerImePrezime.toLowerCase().includes(q),
+      );
+    }
+    this.filtered = result;
   }
 
   onSearch() { this.applySearch(); }
 
   setStatus(s: string) {
     this.statusFilter = s;
-    this.load();
+    this.applySearch();
   }
 
   onDatumChange() { this.load(); }

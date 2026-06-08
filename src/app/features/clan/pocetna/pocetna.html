@@ -102,9 +102,11 @@
             <div class="pred-footer">
               <span class="text-muted">{{ t.brojRezervacija }} mesta od {{ t.maxKapacitet }}</span>
               <button class="btn-primary btn-sm"
-                      [disabled]="!imAktivnuClanarinu || isPast(t.datumVreme)"
+                      [disabled]="!imAktivnuClanarinu || isPast(t.datumVreme) || rezervisaniIds.has(t.id)"
                       [title]="isPast(t.datumVreme) ? 'Termin je već prošao' : ''"
-                      (click)="rezervisi(t.id)">Rezerviši</button>
+                      (click)="rezervisi(t.id)">
+                {{ rezervisaniIds.has(t.id) ? 'Rezervisan' : 'Rezerviši' }}
+              </button>
             </div>
           </div>
           <div *ngIf="filteredPredlozeno.length === 0" class="empty">

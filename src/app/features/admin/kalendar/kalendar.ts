@@ -1,5 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { Aktivnost, Termin, Trener } from '../../../core/models/models';
@@ -24,9 +25,13 @@ export class Kalendar implements OnInit {
   constructor(
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
+    private route: ActivatedRoute,
   ) {}
 
   ngOnInit() {
+    const trenerId = this.route.snapshot.queryParamMap.get('trenerId');
+    if (trenerId) this.filterTrener = trenerId;
+
     forkJoin({
       aktivnosti: this.http.get<Aktivnost[]>(`${environment.apiUrl}/aktivnosti`),
       treneri: this.http.get<Trener[]>(`${environment.apiUrl}/treneri`),

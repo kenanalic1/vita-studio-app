@@ -28,6 +28,24 @@ export class NoviTerminModal implements OnInit {
     private cdr: ChangeDetectorRef,
   ) {}
 
+  get kapacitetSale(): number {
+    const id = +this.form?.get('salaId')?.value;
+    return this.sale.find(s => s.id === id)?.kapacitet ?? 0;
+  }
+
+  private updateMaxKapacitetValidator(salaId: any) {
+    const sala = this.sale.find(s => s.id === +salaId);
+    const ctrl = this.form.get('maxKapacitet')!;
+    if (sala) {
+      ctrl.setValidators([Validators.required, Validators.min(1), Validators.max(sala.kapacitet)]);
+      if (+ctrl.value > sala.kapacitet) ctrl.setValue(sala.kapacitet);
+    } else {
+      ctrl.setValidators([Validators.required, Validators.min(1)]);
+    }
+    ctrl.updateValueAndValidity();
+    this.cdr.detectChanges();
+  }
+
   ngOnInit() {
     this.form = this.fb.group({
       datumVreme: ['', Validators.required],
@@ -37,6 +55,8 @@ export class NoviTerminModal implements OnInit {
       trenerId: ['', Validators.required],
       salaId: ['', Validators.required],
     });
+
+    this.form.get('salaId')!.valueChanges.subscribe(id => this.updateMaxKapacitetValidator(id));
 
     if (this.terminEdit) {
       const dt = new Date(this.terminEdit.datumVreme);
@@ -67,6 +87,8 @@ export class NoviTerminModal implements OnInit {
     this.http.get<Sala[]>(`${environment.apiUrl}/sale`).subscribe({
       next: (s) => {
         this.sale = s;
+        const currentSalaId = this.form.get('salaId')?.value;
+        if (currentSalaId) this.updateMaxKapacitetValidator(currentSalaId);
         this.cdr.detectChanges();
       },
     });
