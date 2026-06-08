@@ -54,7 +54,7 @@ export class Pregled implements OnInit {
     this.loadingExp.add(terminId);
     this.http.get<Rezervacija[]>(`${environment.apiUrl}/rezervacije/termin/${terminId}`).subscribe({
       next: (lista) => {
-        this.terminParticipants.set(terminId, lista.filter(r => r.status === 'aktivna'));
+        this.terminParticipants.set(terminId, lista.filter(r => r.status !== 'otkazana'));
         this.loadingExp.delete(terminId);
         this.cdr.detectChanges();
       },
