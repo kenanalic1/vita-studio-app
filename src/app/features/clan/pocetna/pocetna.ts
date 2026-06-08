@@ -89,8 +89,9 @@ export class Pocetna implements OnInit {
 
   get filteredPredlozeno(): Termin[] {
     if (!this.pocetna?.predlozenoZaTebe) return [];
-    if (this.predlozenoFilter === 'Sve') return this.pocetna.predlozenoZaTebe;
-    return this.pocetna.predlozenoZaTebe.filter((t) =>
+    const budući = this.pocetna.predlozenoZaTebe.filter(t => !this.isPast(t.datumVreme));
+    if (this.predlozenoFilter === 'Sve') return budući;
+    return budući.filter((t) =>
       t.aktivnostNaziv.toLowerCase().includes(this.predlozenoFilter.toLowerCase()),
     );
   }
