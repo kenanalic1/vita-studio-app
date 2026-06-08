@@ -36,7 +36,7 @@ export class ProduziClanarinaModal implements OnInit {
 
   ngOnInit() {
     const tip = this.aktivnaClanarina?.tipPaketa ?? this.defaultTipPaketa;
-    const pocetakStr = new Date().toISOString().split('T')[0];
+    const pocetakStr = this.localDate(new Date());
     const istekStr = this.calcIsteka(pocetakStr, tip);
 
     this.form = this.fb.group({
@@ -67,10 +67,15 @@ export class ProduziClanarinaModal implements OnInit {
     this.form.patchValue({ datumIsteka: this.calcIsteka(pocetakStr, tip) });
   }
 
+  private localDate(d: Date): string {
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  }
+
   private calcIsteka(pocetakStr: string, tip: string): string {
     const d = new Date(pocetakStr);
     d.setDate(d.getDate() + (this.trajanjeDana[tip] ?? 30));
-    return d.toISOString().split('T')[0];
+    return this.localDate(d);
   }
 
   save() {

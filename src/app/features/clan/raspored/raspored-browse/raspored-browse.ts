@@ -74,7 +74,8 @@ export class RasporedBrowse implements OnInit {
     for (let i = 0; i < 7; i++) {
       const d = new Date(monday);
       d.setDate(monday.getDate() + i);
-      const value = d.toISOString().split('T')[0];
+      const pad = (n: number) => String(n).padStart(2, '0');
+      const value = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
       const label = d.toLocaleDateString('sr-Latn', {
         weekday: 'short',
         day: '2-digit',

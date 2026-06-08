@@ -49,7 +49,7 @@ export class Kalendar implements OnInit {
     this.loading = true;
     const ponedeljak = this.getPonedeljak(this.currentDate);
     this.http
-      .get<Termin[]>(`${environment.apiUrl}/termini/nedelja?ponedeljak=${ponedeljak.toISOString().split('T')[0]}`)
+      .get<Termin[]>(`${environment.apiUrl}/termini/nedelja?ponedeljak=${this.toLocalDate(ponedeljak)}`)
       .subscribe({
         next: (t) => {
           this.termini = t;
@@ -132,6 +132,11 @@ export class Kalendar implements OnInit {
       Stretching: '#86efac', Barre: '#f0abfc', Meditacija: '#c4b5fd',
     };
     return colors[naziv] ?? '#e5e7eb';
+  }
+
+  private toLocalDate(d: Date): string {
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
   }
 
   isToday(date: Date): boolean {
