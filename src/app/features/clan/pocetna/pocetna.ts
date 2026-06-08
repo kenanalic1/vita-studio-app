@@ -50,6 +50,13 @@ export class Pocetna implements OnInit {
         this.cdr.detectChanges();
       },
     });
+
+    this.rezSvc.getMoje().subscribe({
+      next: (lista) => {
+        this.rezervisaniIds = new Set(lista.filter(r => r.status === 'aktivna').map(r => r.terminId));
+        this.cdr.detectChanges();
+      },
+    });
   }
 
   get userName(): string {

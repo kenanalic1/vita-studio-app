@@ -39,6 +39,16 @@ export class RasporedBrowse implements OnInit {
     this.loadTermini(this.selectedDan);
     this.checkClanarina();
     this.loadAktivnosti();
+    this.loadMojeRezervacije();
+  }
+
+  loadMojeRezervacije() {
+    this.rezSvc.getMoje().subscribe({
+      next: (lista) => {
+        lista.filter(r => r.status === 'aktivna').forEach(r => this.rezervisaniIds.add(r.terminId));
+        this.cdr.detectChanges();
+      },
+    });
   }
 
   loadAktivnosti() {
